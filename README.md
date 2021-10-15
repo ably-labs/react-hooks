@@ -16,7 +16,7 @@ The hooks provide a simplified syntax for interacting with Ably, and manage the 
 The hooks ship as an ES6 module, so you can use the `import` syntax in your react code.
 
 ```bash
-npm install --save @snakemode/ably-react-hooks
+npm install --save @ably-labs/react-hooks
 ```
 
 This works out of the box using `create-react-app` - and you can use the package immediately.
@@ -39,7 +39,7 @@ Once you've added the package using `npm` to your project, you can use the hooks
 Start by adding a reference to the hooks
 
 ```javascript
-import { configureAbly, useChannel } from "@snakemode/ably-react-hooks";
+import { configureAbly, useChannel } from "@ably-labs/react-hooks";
 ```
 
 Then you need to use the `configureAbly` function to create an instance of the `Ably` JavaScript SDK.
