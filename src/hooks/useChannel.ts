@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { assertConfiguration } from "../AblyReactHooks";
 
 export type AblyMessageCallback = (message: Types.Message) => void;
-export type ChannelAndClient = [channel: Types.RealtimeChannelBase, message: Types.RealtimePromise];
+export type ChannelAndClient = [channel: Types.RealtimeChannelCallbacks, message: Types.RealtimePromise];
 
 export function useChannel(channelName: string, callbackOnMessage: AblyMessageCallback): ChannelAndClient;
 export function useChannel(channelName: string, event: string, callbackOnMessage: AblyMessageCallback): ChannelAndClient;
