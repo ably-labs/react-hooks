@@ -22,6 +22,9 @@ export function useChannel(channelName: string, ...channelSubscriptionArguments:
     }
 
     const useEffectHook = () => {
+        if(!channel) {
+            return
+        }
         onMount();
         return () => { onUnmount(); };
     };
