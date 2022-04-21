@@ -18,7 +18,8 @@ export function useChannel(channelName: string, ...channelSubscriptionArguments:
     }
 
     const onUnmount = () => {
-        channel.unsubscribe.apply(channel, channelSubscriptionArguments);
+        channel.unsubscribe.apply(channel, channelSubscriptionArguments);        
+        channel.detach();
     }
 
     const useEffectHook = () => {
