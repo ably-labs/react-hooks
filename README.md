@@ -69,7 +69,8 @@ const [channel, ably] = useChannel("your-channel-name", (message) => {
     console.log(message);
 });
 ```
-Both the channel instance, and the Ably JavaScript SDK instance are returned from the useChannel call.
+
+**Both the channel instance, and the Ably JavaScript SDK instance are returned from the useChannel call.**
 
 `useChannel` really shines when combined with a regular react `useState` hook - for example, you could keep a list of messages in your app state, and use the `useChannel` hook to subscribe to a channel, and update the state when new messages arrive.
 
@@ -85,7 +86,7 @@ const messagePreviews = messages.map((msg, index) => <li key={index}>{msg.data.s
 
 `useChannel` supports all of the parameter combinations of a regular call to `channel.subscribe`, so you can filter the messages you subscribe to by providing a `message type` to the `useChannel` function:
 
-```javascript    
+```javascript
 const [channel] = useChannel("your-channel-name", "test-message", (message) => {
     console.log(message); // Only logs messages sent using the `test-message` message type
 });
@@ -95,6 +96,31 @@ The `channel` instance returned by `useChannel` can be used to send messages to 
 
 ```javascript
 channel.publish("test-message", { text: "message text" });
+```
+
+Because we're returning the channel instance, and Ably SDK instance from our `useChannel` hook, you can subsequently use these to perform any operations you like on the channel.
+
+For example, you could retrieve history like this:
+
+```javascript
+const [channel] = useChannel("your-channel-name", (message) => {
+    console.log(message);
+});
+
+const history = channel.history((err, result) => {
+    var lastMessage = resultPage.items[0];
+    console.log('Last message: ' + lastMessage.id + ' - ' + lastMessage.data);
+});
+```
+
+It's also worth highlighting that the `useChannel` hook supports all of the additional parameters that the regular Ably SDK does as we're simply passing the call along.
+This means you can use features like `rewind`:
+
+```javascript
+const [channel] = useChannel("[?rewind=100]your-channel-name", (message) => {
+    // This call will rewind 100 messages
+    console.log(message);
+});
 ```
 
 ## usePresence

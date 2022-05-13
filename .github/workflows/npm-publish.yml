@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  paths:
+    exclude:
+      - README.md
 
 jobs:
   build:
