@@ -21,6 +21,8 @@ npm install --save @ably-labs/react-hooks
 
 This works out of the box using `create-react-app` - and you can use the package immediately.
 
+**If you're using `Next.js`, please see [the guide at the bottom of this document](#nextjs).**
+
 # Ably channels and API keys
 
 In order to use these hooks, you will need an Ably API key. If you are not already signed up, you can [sign up now for a free Ably account](https://www.ably.io/signup). Once you have an Ably account:
@@ -149,3 +151,31 @@ updateStatus("new status");
 ```
 
 The new state will be sent to the channel, and any other clients subscribed to the channel will be notified of the change immediately.
+
+<a name="nextjs"></a>
+## Usage from Next.js
+
+Because this package is provided as `ES Modules` it requires the use of the `import` and `export` keywords. This means, if you're using a framework that doesn't currently support ES Modules (like Next.js), you'll need to transpile for that runtime environment. Over time, it's expected that everything will support native modules.
+
+To use Next:
+
+1. Install `next-transpile-modules`
+
+```bash
+npm install next-transpile-modules --save
+```
+
+2. Modify your `next.config.js` to use `next-transpile-modules`
+
+```js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+}
+
+const withTM = require('next-transpile-modules')(['@ably-labs/react-hooks']);
+
+module.exports = withTM(nextConfig);
+```
+
+The hooks will now work as expected in your Next.js app.
