@@ -23,6 +23,15 @@ This works out of the box using `create-react-app` - and you can use the package
 
 **If you're using `Next.js`, please see [the guide at the bottom of this document](#nextjs).**
 
+# Compatible React Versions
+
+The latest version of this package tracks the latest version of react.
+
+| React Version | @ably-labs/react-hooks Version |
+|----------|--------|
+| >=17.0.2 |  1.1.8 |
+| >=18.1.0 |  2.0.0 (current) |
+
 # Ably channels and API keys
 
 In order to use these hooks, you will need an Ably API key. If you are not already signed up, you can [sign up now for a free Ably account](https://www.ably.io/signup). Once you have an Ably account:
