@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { configureAbly, useChannel, usePresence } from "/src/index.js";
 import "./App.css";
 
-configureAbly({ key: "your-ably-api-key", clientId: generateRandomId() });
+configureAbly({ key: "YOUR_ABLY_API_KEY", clientId: generateRandomId() });
 
 function App() {
   const [messages, updateMessages] = useState([]);

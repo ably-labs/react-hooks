@@ -1,7 +1,8 @@
 {
   "name": "@ably-labs/react-hooks",
-  "version": "2.0.1",
+  "version": "2.0.4",
   "description": "",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

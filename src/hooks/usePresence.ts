@@ -1,6 +1,6 @@
 import { Types } from "ably";
 import { useEffect, useState } from 'react';
-import { assertConfiguration } from "../AblyReactHooks";
+import { assertConfiguration } from "../AblyReactHooks.js";
 
 export type PresenceDataAndPresenceUpdateFunction = [
     presenceData: Types.PresenceMessage[],
