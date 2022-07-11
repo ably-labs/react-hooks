@@ -1,4 +1,4 @@
-# ably-react-hooks
+# @ably-labs/react-hooks
 
 Use Ably in your React application using idiomatic, easy to use, React Hooks!
 
@@ -11,7 +11,22 @@ Using this package you can:
 
 The hooks provide a simplified syntax for interacting with Ably, and manage the lifecycle of the Ably SDK instances for you taking care to subscribe and unsubscribe to channels and events when your react componenets re-render.
 
-# Installation
+---
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=6 orderedList=false} -->
+<!-- code_chunk_output -->
+
+- [Installation](#installation)
+- [Compatible React Versions](#compatible-react-versions)
+- [Ably channels and API keys](#ably-channels-and-api-keys)
+- [Usage](#usage)
+- [useChannel](#usechannel)
+- [usePresence](#usepresence)
+
+<!-- /code_chunk_output -->
+---
+
+## Installation
 
 The hooks ship as an ES6 module, so you can use the `import` syntax in your react code.
 
@@ -21,16 +36,16 @@ npm install --save @ably-labs/react-hooks
 
 This works out of the box using `create-react-app` - and you can use the package immediately.
 
-# Compatible React Versions
+## Compatible React Versions
 
 The latest version of this package tracks the latest version of react.
 
 | React Version | @ably-labs/react-hooks Version |
 |----------|--------|
 | >=17.0.2 |  1.1.8 |
-| >=18.1.0 |  2.0.0 (current) |
+| >=18.1.0 |  2.0.x (current) |
 
-# Ably channels and API keys
+## Ably channels and API keys
 
 In order to use these hooks, you will need an Ably API key. If you are not already signed up, you can [sign up now for a free Ably account](https://www.ably.io/signup). Once you have an Ably account:
 
@@ -41,7 +56,9 @@ In order to use these hooks, you will need an Ably API key. If you are not alrea
 
 It is strongly recommended that you use [Token Authentication](https://www.ably.io/documentation/rest/authentication/#token-authentication), this will require server side code that is outside of the scope of this readme. In the examples below we use an API key directly in the markup, this is for ***local development only** and **should not be used for production code** and **should not** be committed to your repositories.
 
-# Usage
+---
+
+## Usage
 
 Once you've added the package using `npm` to your project, you can use the hooks in your `react` code.
 
@@ -69,11 +86,13 @@ const [channel] = useChannel("your-channel-name", (message) => {
 
 Every time a message is sent to `your-channel-name` it'll be logged to the console. You can do whatever you need to with those messages.
 
+---
+
 ## useChannel
 
 The useChannel hook lets you subscribe to a channel and receive messages from it.
 
-```javascript    
+```javascript
 const [channel, ably] = useChannel("your-channel-name", (message) => {
     console.log(message);
 });
@@ -131,6 +150,8 @@ const [channel] = useChannel("[?rewind=100]your-channel-name", (message) => {
     console.log(message);
 });
 ```
+
+---
 
 ## usePresence
 
