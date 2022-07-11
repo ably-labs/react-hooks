@@ -11,5 +11,5 @@
         "src": "/src",
         "dist": "/dist"
     },
-    "plugins": []
+    "plugins": ["@snowpack/plugin-dotenv"]
 }

@@ -2,32 +2,36 @@ import { Types } from "ably";
 import { useEffect, useState } from 'react';
 import { assertConfiguration } from "../AblyReactHooks.js";
 
-export type PresenceDataAndPresenceUpdateFunction = [
-    presenceData: Types.PresenceMessage[],
-    updateStatus: (message: string) => void
+export type PresenceDataAndPresenceUpdateFunction<T> = [
+    presenceData: PresenceMessage<T>[],
+    updateStatus: (messageOrPresenceObject: T) => void
 ];
 
-export function usePresence(channelName: string, statusMessage?: string): PresenceDataAndPresenceUpdateFunction {
+export type OnPresenceMessageReceived<T> = (presenceData: PresenceMessage<T>) => void;
+export type UseStatePresenceUpdate = (presenceData: Types.PresenceMessage[]) => void;
+
+export function usePresence<T = any>(channelName: string, messageOrPresenceObject?: T, onPresenceUpdated?: OnPresenceMessageReceived<T>): PresenceDataAndPresenceUpdateFunction<T> {
     const ably = assertConfiguration();
 
-    const [presenceData, updatePresenceData] = useState([]);
+    const [presenceData, updatePresenceData] = useState([]) as [Array<PresenceMessage<T>>, UseStatePresenceUpdate];
     const channel = ably.channels.get(channelName);
 
-    const updatePresence = async () => {
-        updatePresenceData(await channel.presence.get());
-    }
+    const updatePresence = async (message?: Types.PresenceMessage) => {
+        onPresenceUpdated?.call(this, message);
 
-    const updateStatus = (message: string) => {
-        channel.presence.update(message);
-    };
+        const snapshot = await channel.presence.get();
+        updatePresenceData(snapshot);
+    }
 
     const onMount = async () => {
         channel.presence.subscribe('enter', updatePresence);
         channel.presence.subscribe('leave', updatePresence);
         channel.presence.subscribe('update', updatePresence);
 
-        await channel.presence.enter(statusMessage || "");
-        updatePresenceData(await channel.presence.get());
+        await channel.presence.enter(messageOrPresenceObject);
+
+        const snapshot = await channel.presence.get();
+        updatePresenceData(snapshot);
     }
 
     const onUnmount = () => {
@@ -43,6 +47,20 @@ export function usePresence(channelName: string, statusMessage?: string): Presen
     };
 
     useEffect(useEffectHook, []);
+    
+    const updateStatus = (messageOrPresenceObject: T) => {
+        channel.presence.update(messageOrPresenceObject);
+    };
 
     return [presenceData, updateStatus];
+}
+
+interface PresenceMessage<T = any> {
+    action: Types.PresenceAction;
+    clientId: string;
+    connectionId: string;
+    data: T;
+    encoding: string;
+    id: string;
+    timestamp: number;
 }
