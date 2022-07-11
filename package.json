@@ -6,10 +6,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "npx snowpack dev",
-    "build": "npx snowpack build",
+    "start": "npx vite serve",
     "test": "vitest run",
-    "ci": "tsc"
+    "ci": "npm run test && tsc"
   },
   "repository": {
     "type": "git",
@@ -22,14 +21,11 @@
   },
   "homepage": "https://github.com/ably-labs/react-hooks#readme",
   "devDependencies": {
-    "@snowpack/plugin-dotenv": "^2.2.0",
-    "@snowpack/plugin-react-refresh": "^2.5.0",
     "@testing-library/react": "^13.3.0",
     "@vitejs/plugin-react": "^1.3.2",
     "jsdom": "^20.0.0",
     "react": ">=18.1.0",
     "react-dom": ">=18.1.0",
-    "snowpack": "^3.8.8",
     "typescript": ">=4.4.4",
     "vitest": "^0.18.0"
   },

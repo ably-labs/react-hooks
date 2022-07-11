@@ -17,11 +17,12 @@ The hooks provide a simplified syntax for interacting with Ably, and manage the 
 <!-- code_chunk_output -->
 
 - [Installation](#installation)
-- [Compatible React Versions](#compatible-react-versions)
-- [Ably channels and API keys](#ably-channels-and-api-keys)
+  - [Compatible React Versions](#compatible-react-versions)
+  - [Ably channels and API keys](#ably-channels-and-api-keys)
 - [Usage](#usage)
-- [useChannel](#usechannel)
-- [usePresence](#usepresence)
+  - [useChannel](#usechannel)
+  - [usePresence](#usepresence)
+- [Developer Notes](#developer-notes)
 
 <!-- /code_chunk_output -->
 ---
@@ -36,7 +37,7 @@ npm install --save @ably-labs/react-hooks
 
 This works out of the box using `create-react-app` - and you can use the package immediately.
 
-## Compatible React Versions
+### Compatible React Versions
 
 The latest version of this package tracks the latest version of react.
 
@@ -45,7 +46,7 @@ The latest version of this package tracks the latest version of react.
 | >=17.0.2 |  1.1.8 |
 | >=18.1.0 |  2.0.x (current) |
 
-## Ably channels and API keys
+### Ably channels and API keys
 
 In order to use these hooks, you will need an Ably API key. If you are not already signed up, you can [sign up now for a free Ably account](https://www.ably.io/signup). Once you have an Ably account:
 
@@ -88,7 +89,7 @@ Every time a message is sent to `your-channel-name` it'll be logged to the conso
 
 ---
 
-## useChannel
+### useChannel
 
 The useChannel hook lets you subscribe to a channel and receive messages from it.
 
@@ -153,7 +154,7 @@ const [channel] = useChannel("[?rewind=100]your-channel-name", (message) => {
 
 ---
 
-## usePresence
+### usePresence
 
 The usePresence hook lets you subscribe to presence events on a channel - this will allow you to get notified when a user joins or leaves the channel.
 
@@ -215,3 +216,27 @@ interface MyPresenceType {
 ```
 
 `PresenceData` is a good way to store synchronised, per-client metadata, so types here are especially valuable.
+
+---
+
+## Developer Notes
+
+This repository is configured to execute using Vite - which will load a sample web app that acts as a simple test harness for the hooks.
+
+You can run the dev server from the terminal using:
+
+```bash
+npm run start
+```
+
+You'll need to provide an API key for the sample to work (or you'll just get a white page and some errors in the console). To do this, create the file `./src/.env` and add the following line:
+
+```.env
+VITE_ABLY_API_KEY=<your-api-key>
+```
+
+This API key will be loaded by the vite dev server at build time.
+
+You can run the `unit tests` by running `npm run test` in the terminal.
+
+You can build the published artefacts by running `npm run ci` in the terminal. The node module is distrubted as an ES6 module, and requires consumers to be able to import modules in their react apps. The test application and unit tests are excluded from the generated `dist` folder to prevent confusion at runtime.

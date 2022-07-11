@@ -1,21 +1,24 @@
+import { Types } from "ably";
 import React, { useState } from "react";
-import { configureAbly, useChannel, usePresence } from "/src/index.js";
+import { configureAbly, useChannel, usePresence } from "../../src/index";
 import "./App.css";
 
-configureAbly({ key: "YOUR_ABLY_API_KEY", clientId: generateRandomId() });
+configureAbly({ key: import.meta.env.VITE_ABLY_API_KEY, clientId: generateRandomId() });
 
 function App() {
-  const [messages, updateMessages] = useState([]);
+  const [messages, updateMessages] = useState<Types.Message[]>([]);
   const [channel, ably] = useChannel("your-channel-name", (message) => {
     updateMessages((prev) => [...prev, message]);
   });
 
-  const [presenceData, updateStatus] = usePresence("your-channel-name");
+  const [presenceData, updateStatus] = usePresence("your-channel-name", { foo: "bar" }, (update) => {
+    console.log(update);
+  });
 
   const messagePreviews = messages.map((msg, index) => <li key={index}>{msg.data.text}</li>);
   const presentClients = presenceData.map((msg, index) => (
     <li key={index}>
-      {msg.clientId}: {msg.data}
+      {msg.clientId}: {JSON.stringify(msg.data)}
     </li>
   ));
 
@@ -32,7 +35,7 @@ function App() {
         </button>
         <button
           onClick={() => {
-            updateStatus("hello");
+            updateStatus({ foo: "baz" });
           }}
         >
           Update status to hello
