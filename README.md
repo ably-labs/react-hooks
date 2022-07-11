@@ -136,6 +136,8 @@ const [channel] = useChannel("[?rewind=100]your-channel-name", (message) => {
 
 The usePresence hook lets you subscribe to presence events on a channel - this will allow you to get notified when a user joins or leaves the channel.
 
+**Please note** that fetching present members is executed as an effect, so it'll load in *after* your component renders for the first time.
+
 ```javascript
 const [presenceData, updateStatus] = usePresence("your-channel-name");
 
@@ -149,12 +151,46 @@ You can optionally provide a string when you `usePresence` to set an initial `pr
 
 ```javascript
 const [presenceData, updateStatus] = usePresence("your-channel-name", "initial state");
-```
 
-The `updateStatus` function can be used to update the presence data for the current client:
-
-```javascript
+// The `updateStatus` function can be used to update the presence data for the current client
 updateStatus("new status");
 ```
 
 The new state will be sent to the channel, and any other clients subscribed to the channel will be notified of the change immediately.
+
+If you don't want to use the `presenceData` returned from usePresence, you can configure a callback
+
+```javascript
+const [_, updateStatus] = usePresence("your-channel-name", "initial state", (presenceUpdate) => {
+    console.log(presenceUpdate);
+});
+```
+
+usePresence supports objects, as well as strings
+
+```javascript
+usePresence("your-channel-name", { foo: "bar" });
+```
+
+and if you're using `TypeScript` there are type hints to make sure that updates are of the same `type` as your initial constraint, or a provided generic type parameter:
+
+```tsx
+const TypedUsePresenceComponent = () => {
+    // In this example MyPresenceType will be checked - if omitted, the shape of the initial 
+    // value will be used ...and if that's omitted, `any` will be the default.
+
+    const [val] = usePresence<MyPresenceType>("testChannelName", { foo: "bar" });
+
+    return (
+        <div role='presence'>
+            {JSON.stringify(val)}
+        </div>
+    );
+}
+
+interface MyPresenceType {
+    foo: string;
+}
+```
+
+`PresenceData` is a good way to store synchronised, per-client metadata, so types here are especially valuable.
