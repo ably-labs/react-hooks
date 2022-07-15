@@ -1,6 +1,6 @@
 import { Types } from "ably";
 import { useEffect, useState } from 'react';
-import { assertConfiguration } from "../AblyReactHooks.js";
+import { assertConfiguration, ChannelParameters } from "../AblyReactHooks.js";
 
 export type PresenceDataAndPresenceUpdateFunction<T> = [
     presenceData: PresenceMessage<T>[],
@@ -10,11 +10,18 @@ export type PresenceDataAndPresenceUpdateFunction<T> = [
 export type OnPresenceMessageReceived<T> = (presenceData: PresenceMessage<T>) => void;
 export type UseStatePresenceUpdate = (presenceData: Types.PresenceMessage[]) => void;
 
-export function usePresence<T = any>(channelName: string, messageOrPresenceObject?: T, onPresenceUpdated?: OnPresenceMessageReceived<T>): PresenceDataAndPresenceUpdateFunction<T> {
+export function usePresence<T = any>(channelNameOrNameAndOptions: ChannelParameters, messageOrPresenceObject?: T, onPresenceUpdated?: OnPresenceMessageReceived<T>): PresenceDataAndPresenceUpdateFunction<T> {
     const ably = assertConfiguration();
 
+    const channelName = typeof channelNameOrNameAndOptions === 'string'
+        ? channelNameOrNameAndOptions 
+        : channelNameOrNameAndOptions.channelName;
+
+    const channel = typeof channelNameOrNameAndOptions === 'string'
+        ? ably.channels.get(channelName) 
+        : ably.channels.get(channelName, channelNameOrNameAndOptions.options);
+
     const [presenceData, updatePresenceData] = useState([]) as [Array<PresenceMessage<T>>, UseStatePresenceUpdate];
-    const channel = ably.channels.get(channelName);
 
     const updatePresence = async (message?: Types.PresenceMessage) => {
         onPresenceUpdated?.call(this, message);

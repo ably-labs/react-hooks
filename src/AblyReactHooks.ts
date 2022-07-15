@@ -1,6 +1,9 @@
 import Ably from "ably";
 import { Types } from "ably";
 
+export type ChannelNameAndOptions = { channelName: string; options?: Types.ChannelOptions; }
+export type ChannelParameters =  string | ChannelNameAndOptions;
+
 let sdkInstance = null;
 
 export function provideSdkInstance(ablyInstance: Types.RealtimePromise) {

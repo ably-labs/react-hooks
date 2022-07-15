@@ -152,6 +152,16 @@ const [channel] = useChannel("[?rewind=100]your-channel-name", (message) => {
 });
 ```
 
+We also support providing [ChannelOptions](https://ably.com/docs/api/realtime-sdk/types#channel-options) to the `useChannel` hook:
+
+```javascript
+const [channel] = useChannel({ channelName: "your-channel-name", options: { ... } }, (message) => {
+    ...
+});
+```
+
+for any cases where channel options must be provided (e.g. setting up encryption cypher keys).
+
 ---
 
 ### usePresence
