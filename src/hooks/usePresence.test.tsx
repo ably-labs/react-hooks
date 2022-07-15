@@ -26,7 +26,7 @@ describe("usePresence", () => {
         
         await act(async () => {
             await wait(2); 
-            // To let react run it's updates so we don't see warnings in the test output
+            // To let react run its updates so we don't see warnings in the test output
         });
     });
 
