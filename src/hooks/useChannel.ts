@@ -19,16 +19,23 @@ export function useChannel(channelNameOrNameAndOptions: ChannelParameters, ...ch
         ? ably.channels.get(channelName) 
         : ably.channels.get(channelName, channelNameOrNameAndOptions.options);
 
-    const onMount = () => {
-        channel.subscribe.apply(channel, channelSubscriptionArguments);
+    const onMount = async () => {
+        await channel.subscribe.apply(channel, channelSubscriptionArguments);
     }
 
-    const onUnmount = () => {
-        channel.unsubscribe.apply(channel, channelSubscriptionArguments);
+    const onUnmount = async () => {
+        await channel.unsubscribe.apply(channel, channelSubscriptionArguments);
         
-        if (channel.state == "attached") {
-            channel.detach();
-        }
+        setTimeout(async () => {
+            // React is very mount/unmount happy, so if we just detatch the channel
+            // it's quite likely it will be reattached again by a subsequent onMount calls.
+            // To solve this, we set a timer, and if all the listeners have been removed, we know that the component
+            // has been removed for good and we can detatch the channel.
+
+            if (channel.listeners.length === 0) {
+                await channel.detach();
+            }
+        }, 2500);
     }
 
     const useEffectHook = () => {
