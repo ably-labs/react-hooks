@@ -24,10 +24,10 @@ export function usePresence<T = any>(channelNameOrNameAndOptions: ChannelParamet
     const [presenceData, updatePresenceData] = useState([]) as [Array<PresenceMessage<T>>, UseStatePresenceUpdate];
 
     const updatePresence = async (message?: Types.PresenceMessage) => {
-        onPresenceUpdated?.call(this, message);
-
         const snapshot = await channel.presence.get();
         updatePresenceData(snapshot);
+        
+        onPresenceUpdated?.call(this, message);
     }
 
     const onMount = async () => {
