@@ -42,7 +42,9 @@ export function usePresence<T = any>(channelNameOrNameAndOptions: ChannelParamet
     }
 
     const onUnmount = () => {
-        channel.presence.leave();
+        if (channel.state == 'attached') {
+            channel.presence.leave();
+        }
         channel.presence.unsubscribe('enter');
         channel.presence.unsubscribe('leave');
         channel.presence.unsubscribe('update');
