@@ -9,7 +9,7 @@ Using this package you can:
 - Get notifications of user presence on channels
 - Send presence updates
 
-The hooks provide a simplified syntax for interacting with Ably, and manage the lifecycle of the Ably SDK instances for you taking care to subscribe and unsubscribe to channels and events when your react componenets re-render.
+The hooks provide a simplified syntax for interacting with Ably, and manage the lifecycle of the Ably SDK instances for you taking care to subscribe and unsubscribe to channels and events when your react components re-render.
 
 ---
 
