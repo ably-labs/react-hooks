@@ -7,18 +7,19 @@
         "./src/fakes/**/*.ts"
     ],
     "compilerOptions": {
-        "module": "ES6",
+        "module": "CommonJS",
         "target": "es6",
-        "outDir": "dist",
+        "outDir": "dist/cjs",
         "rootDir": "./src",
         "sourceMap": true,
         "strict": false,
         "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "declaration": true,
         "moduleResolution": "node",
         "skipLibCheck": true,
         "allowJs": true,
-        "jsx": "react-jsx",    
+        "jsx": "react-jsx",
         "lib": [
             "DOM",
             "DOM.Iterable",
