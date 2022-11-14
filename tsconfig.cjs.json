@@ -1,32 +1,7 @@
 {
-    "include": [
-        "./src/**/*.ts"
-    ],
-    "exclude": [
-        "./src/**/*.test.tsx",
-        "./src/fakes/**/*.ts"
-    ],
+    "extends": "./tsconfig.base.json",
     "compilerOptions": {
         "module": "CommonJS",
-        "target": "es6",
         "outDir": "dist/cjs",
-        "rootDir": "./src",
-        "sourceMap": true,
-        "strict": false,
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-        "declaration": true,
-        "moduleResolution": "node",
-        "skipLibCheck": true,
-        "allowJs": true,
-        "jsx": "react-jsx",
-        "lib": [
-            "DOM",
-            "DOM.Iterable",
-            "ESNext"
-        ],
-        "types": [
-            "vitest/globals"
-        ]
     }
 }
