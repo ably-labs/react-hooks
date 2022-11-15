@@ -1,14 +1,21 @@
 {
   "name": "@ably-labs/react-hooks",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "description": "",
-  "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/mjs/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "npx vite serve",
     "test": "vitest run",
-    "ci": "npm run test && tsc"
+    "ci": "npm run test && npm run build",
+    "build": "npm run build:cjs && npm run build:mjs",
+    "build:mjs": "tsc --project tsconfig.mjs.json && cp res/package.mjs.json dist/mjs/package.json",
+    "build:cjs": "tsc --project tsconfig.cjs.json && cp res/package.cjs.json dist/cjs/package.json"
+  },
+  "exports": {
+    "import": "./dist/mjs/index.js",
+    "require": "./dist/cjs/index.js"
   },
   "repository": {
     "type": "git",
