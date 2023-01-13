@@ -1,5 +1,5 @@
 import { it, beforeEach, describe, expect } from 'vitest';
-import { provideSdkInstance } from "../AblyReactHooks";
+import { provideSdkInstance, Realtime } from "../AblyReactHooks";
 import { useChannel } from "./useChannel";
 import { useState } from "react";
 import { render, screen } from '@testing-library/react';
@@ -50,7 +50,34 @@ describe("useChannel", () => {
         expect(messageUl.children[0].innerHTML).toBe("message text1");
         expect(messageUl.children[1].innerHTML).toBe("message text2");
     });
+
+    it("useChannel works with multiple clients", async () => {
+        render(<UseChannelComponentMultipleClients client1={ablyClient} client2={otherClient}></UseChannelComponentMultipleClients>);
+
+        await act(async () => {
+            ablyClient.channels.get("blah").publish({ text: "message text1" });
+            otherClient.channels.get("bleh").publish({ text: "message text2" });
+        });
+
+        const messageUl = screen.getAllByRole("messages")[0];
+        expect(messageUl.children[0].innerHTML).toBe("message text1");
+        expect(messageUl.children[1].innerHTML).toBe("message text2");
+    });
 });
+
+const UseChannelComponentMultipleClients = ({client1, client2}) => {
+    const [messages, updateMessages] = useState<Types.Message[]>([]);
+    const [channel1] = useChannel({channelName: "blah", realtime: client1}, (message) => {
+        updateMessages((prev) => [...prev, message]);
+    });
+    const [channel2] = useChannel({channelName: "bleh", realtime: client2}, (message) => {
+        updateMessages((prev) => [...prev, message]);
+    });
+    
+    const messagePreviews = messages.map((msg, index) => <li key={index}>{msg.data.text}</li>);
+    
+    return (<ul role="messages">{messagePreviews}</ul>);
+}
 
 const UseChannelComponent = () => {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
