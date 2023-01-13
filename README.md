@@ -152,12 +152,24 @@ const [channel] = useChannel("[?rewind=100]your-channel-name", (message) => {
 });
 ```
 
-We also support providing [ChannelOptions](https://ably.com/docs/api/realtime-sdk/types#channel-options) to the `useChannel` hook:
+We support providing [ChannelOptions](https://ably.com/docs/api/realtime-sdk/types#channel-options) to the `useChannel` hook:
 
 ```javascript
 const [channel] = useChannel({ channelName: "your-channel-name", options: { ... } }, (message) => {
     ...
 });
+```
+
+We also support providing your own `Realtime` instance to `useChannel`, which may be useful if you need to have more than one Ably client on the same page:
+
+```javascript
+import { useChannel, Realtime } from '@ably-labs/react-hooks'
+
+const realtime = new Realtime(options);
+
+useChannel({ channelName: "your-channel-name", realtime: realtime }, (message) => {
+    ...
+})
 ```
 
 for any cases where channel options must be provided (e.g. setting up encryption cypher keys).
@@ -226,6 +238,18 @@ interface MyPresenceType {
 ```
 
 `PresenceData` is a good way to store synchronised, per-client metadata, so types here are especially valuable.
+
+We also support providing your own `Realtime` instance to `usePresence`, which may be useful if you need to have more than one Ably client on the same page:
+
+```javascript
+import { useChannel, Realtime } from '@ably-labs/react-hooks'
+
+const realtime = new Realtime(options);
+
+usePresence({ channelName: "your-channel-name", realtime: realtime }, (presenceUpdate) => {
+    ...
+})
+```
 
 ---
 
