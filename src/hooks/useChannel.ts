@@ -9,7 +9,9 @@ export function useChannel(channelNameOrNameAndOptions: ChannelParameters, callb
 export function useChannel(channelNameOrNameAndOptions: ChannelParameters, event: string, callbackOnMessage: AblyMessageCallback): ChannelAndClient;
 
 export function useChannel(channelNameOrNameAndOptions: ChannelParameters, ...channelSubscriptionArguments: any[]): ChannelAndClient {
-    const ably = assertConfiguration();
+    const ably = typeof channelNameOrNameAndOptions === 'string'
+      ? assertConfiguration()
+      : (channelNameOrNameAndOptions.realtime || assertConfiguration())
 
     const channelName = typeof channelNameOrNameAndOptions === 'string'
         ? channelNameOrNameAndOptions 
