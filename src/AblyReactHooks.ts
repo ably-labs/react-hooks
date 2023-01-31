@@ -4,14 +4,30 @@ import { Types } from "ably";
 export type ChannelNameAndOptions = { channelName: string; options?: Types.ChannelOptions; realtime?: Types.RealtimePromise }
 export type ChannelParameters =  string | ChannelNameAndOptions;
 
-let sdkInstance = null;
+const version = "2.1.0"
+
+let sdkInstance: Realtime | null = null;
+
+export class Realtime extends Ably.Realtime.Promise {
+  constructor(options: string | Types.ClientOptions) {
+    if (typeof options === "string") {
+      options = {
+        key: options,
+      } as Types.ClientOptions;
+    }
+
+    (options as any).agents = [`react-hooks/${version}`]
+
+    super(options);
+  }
+}
 
 export function provideSdkInstance(ablyInstance: Types.RealtimePromise) {
     sdkInstance = ablyInstance;
 }
 
 export function configureAbly(ablyConfigurationObject: string | Types.ClientOptions) {
-  return sdkInstance || (sdkInstance = new Ably.Realtime.Promise(ablyConfigurationObject));
+  return sdkInstance || (sdkInstance = new Realtime(ablyConfigurationObject));
 }
 
 export function assertConfiguration(): Types.RealtimePromise {
@@ -21,5 +37,3 @@ export function assertConfiguration(): Types.RealtimePromise {
 
   return sdkInstance;
 }
-
-export const Realtime = Ably.Realtime.Promise;
