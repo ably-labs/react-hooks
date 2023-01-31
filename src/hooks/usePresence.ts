@@ -11,7 +11,9 @@ export type OnPresenceMessageReceived<T> = (presenceData: PresenceMessage<T>) =>
 export type UseStatePresenceUpdate = (presenceData: Types.PresenceMessage[]) => void;
 
 export function usePresence<T = any>(channelNameOrNameAndOptions: ChannelParameters, messageOrPresenceObject?: T, onPresenceUpdated?: OnPresenceMessageReceived<T>): PresenceDataAndPresenceUpdateFunction<T> {
-    const ably = assertConfiguration();
+    const ably = typeof channelNameOrNameAndOptions === 'string'
+      ? assertConfiguration()
+      : (channelNameOrNameAndOptions.realtime || assertConfiguration())
 
     const channelName = typeof channelNameOrNameAndOptions === 'string'
         ? channelNameOrNameAndOptions 

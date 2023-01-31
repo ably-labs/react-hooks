@@ -1,7 +1,7 @@
 import Ably from "ably";
 import { Types } from "ably";
 
-export type ChannelNameAndOptions = { channelName: string; options?: Types.ChannelOptions; }
+export type ChannelNameAndOptions = { channelName: string; options?: Types.ChannelOptions; realtime?: Types.RealtimePromise }
 export type ChannelParameters =  string | ChannelNameAndOptions;
 
 let sdkInstance = null;
@@ -21,3 +21,5 @@ export function assertConfiguration(): Types.RealtimePromise {
 
   return sdkInstance;
 }
+
+export const Realtime = Ably.Realtime.Promise;

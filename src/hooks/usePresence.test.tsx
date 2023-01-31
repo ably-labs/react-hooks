@@ -77,6 +77,20 @@ describe("usePresence", () => {
         const values = screen.getByRole("presence").innerHTML;
         expect(values).toContain(`"data":{"foo":"bar"}`);
     });
+
+    it("usePresence works with multiple clients", async () => {
+        render(<UsePresenceComponentMultipleClients client1={ablyClient} client2={otherClient}></UsePresenceComponentMultipleClients>);
+        
+        await act(async () => {
+            const button = screen.getByText(/Update/i);
+            button.click();
+            await wait(2);
+        });
+
+        const values = screen.getByRole("presence").innerHTML;
+        expect(values).toContain(`"data":"baz1"`);
+        expect(values).toContain(`"data":"baz2"`);
+    });
 });
 
 const UsePresenceComponent = () => {
@@ -90,6 +104,29 @@ const UsePresenceComponent = () => {
         <>
             <button onClick={() => { 
                 update("baz"); 
+            }}>
+                Update
+            </button>
+            <ul role='presence'>
+                {presentUsers}
+            </ul>
+        </>
+    );
+}
+
+const UsePresenceComponentMultipleClients = ({client1, client2}) => {
+    const [val1, update1] = usePresence({channelName: testChannelName, realtime: client1}, "foo");
+    const [val2, update2] = usePresence({channelName: testChannelName, realtime: client2}, "bar");
+    
+    const presentUsers = val1.map((presence, index) => {
+        return (<li key={index}>{presence.clientId} - {JSON.stringify(presence)}</li>)
+    });
+
+    return (
+        <>
+            <button onClick={() => { 
+                update1("baz1"); 
+                update2("baz2"); 
             }}>
                 Update
             </button>
