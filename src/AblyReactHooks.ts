@@ -16,7 +16,7 @@ export class Realtime extends Ably.Realtime.Promise {
       } as Types.ClientOptions;
     }
 
-    (options as any).agents = [`react-hooks/${version}`]
+    (options as any).agents = { 'react-hooks': version };
 
     super(options);
   }
