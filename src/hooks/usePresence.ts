@@ -1,5 +1,5 @@
 import { Types } from "ably";
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { assertConfiguration, ChannelParameters } from "../AblyReactHooks.js";
 
 export type PresenceDataAndPresenceUpdateFunction<T> = [
@@ -59,9 +59,9 @@ export function usePresence<T = any>(channelNameOrNameAndOptions: ChannelParamet
 
     useEffect(useEffectHook, []);
     
-    const updateStatus = (messageOrPresenceObject: T) => {
+    const updateStatus = useCallback((messageOrPresenceObject: T) => {
         channel.presence.update(messageOrPresenceObject);
-    };
+    }, [channel]);
 
     return [presenceData, updateStatus];
 }
