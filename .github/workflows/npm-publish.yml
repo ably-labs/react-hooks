@@ -1,11 +1,7 @@
-name: Release node package
+name: Release NPM package
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - README.md
+  workflow_dispatch:
 
 jobs:
   build:
