@@ -1,6 +1,12 @@
 import { Types } from 'ably';
 import React, { useState } from 'react';
-import { useChannel, usePresence } from '../../src/index';
+import {
+    AblyProvider,
+    useChannel,
+    usePresence,
+    useConnectionState,
+    useChannelState,
+} from '../../src/index';
 import './App.css';
 
 function App() {
@@ -16,6 +22,9 @@ function App() {
             console.log(update);
         }
     );
+
+    const connectionState = useConnectionState('your-channel-name');
+    const channelState = useChannelState('your-channel-name');
 
     const messagePreviews = messages.map((msg, index) => (
         <li key={index}>{msg.data.text}</li>
@@ -47,6 +56,15 @@ function App() {
                     Update status to hello
                 </button>
             </div>
+
+            <h2>Connection State</h2>
+            <div>{connectionState}</div>
+
+            <h2>Channel detach</h2>
+            <button onClick={() => channel.detach()}>Detach</button>
+
+            <h2>Channel State</h2>
+            <div>{channelState}</div>
 
             <h2>Messages</h2>
             <ul>{messagePreviews}</ul>
