@@ -1,3 +1,4 @@
+import Ably from 'ably';
 import { Types } from 'ably';
 
 export type ChannelNameAndOptions = {
