@@ -4,4 +4,4 @@ export * from './hooks/usePresence.js';
 export * from './hooks/useAbly.js';
 export * from './AblyProvider.js';
 export * from './hooks/useConnectionState.js';
-export * from './hooks/useChannelState.js';
+export * from './hooks/useChannelStateListener.js';
