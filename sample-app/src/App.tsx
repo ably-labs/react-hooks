@@ -82,14 +82,6 @@ function App() {
             <h3>Reason</h3>
             <div>{JSON.stringify(channelState.reason)}</div>
 
-            <h2>Channel State with params</h2>
-            <h3>Current</h3>
-            <div>{channelStateWithEvents.current}</div>
-            <h3>Previous</h3>
-            <div>{channelStateWithEvents.previous}</div>
-            <h3>Reason</h3>
-            <div>{JSON.stringify(channelStateWithEvents.reason)}</div>
-
             <h2>Ably error</h2>
             <h3>Reason</h3>
             <div>{ablyErr}</div>

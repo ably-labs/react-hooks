@@ -11,7 +11,21 @@ export interface ChannelStateWithInfo {
 
 export function useChannelStateListener(
     channelNameOrNameAndOptions: ChannelParameters,
+    listener?: (stateChange: ChannelStateWithInfo) => any
+): ChannelStateWithInfo;
+
+export function useChannelStateListener(
+    channelNameOrNameAndOptions: ChannelParameters,
     state?: Types.ChannelState | Types.ChannelState[],
+    listener?: (stateChange: ChannelStateWithInfo) => any
+): ChannelStateWithInfo;
+
+export function useChannelStateListener(
+    channelNameOrNameAndOptions: ChannelParameters,
+    stateOrListener?:
+        | Types.ChannelState
+        | Types.ChannelState[]
+        | ((stateChange: ChannelStateWithInfo) => any),
     listener?: (stateChange: ChannelStateWithInfo) => any
 ): ChannelStateWithInfo {
     const ably = useAbly(
@@ -42,10 +56,16 @@ export function useChannelStateListener(
 
     useEffect(() => {
         const handleStateChange = (stateChange: Types.ChannelStateChange) => {
+            if (typeof stateOrListener === 'function') {
+                listener = stateOrListener;
+                stateOrListener = undefined;
+            }
+
             if (
-                !state ||
-                state === stateChange.current ||
-                (Array.isArray(state) && state.includes(stateChange.current))
+                !stateOrListener ||
+                stateOrListener === stateChange.current ||
+                (Array.isArray(stateOrListener) &&
+                    stateOrListener.includes(stateChange.current))
             ) {
                 setStateChangeInfo({
                     current: stateChange.current,
@@ -68,7 +88,7 @@ export function useChannelStateListener(
         return () => {
             channel.off(handleStateChange);
         };
-    }, [channel, state, listener]);
+    }, [channel, stateOrListener, listener]);
 
     return stateChangeInfo;
 }
