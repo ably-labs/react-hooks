@@ -1,6 +1,6 @@
 import { Types } from 'ably';
-import { ChannelParameters } from '../AblyReactHooks';
 import { useEffect, useState } from 'react';
+import { ChannelNameAndId } from '../AblyReactHooks';
 import { useAbly } from './useAbly';
 
 export interface ChannelStateWithInfo {
@@ -10,8 +10,22 @@ export interface ChannelStateWithInfo {
 }
 
 export function useChannelStateListener(
-    channelNameOrNameAndOptions: ChannelParameters,
+    channelName: string,
+    listener?: (stateChange: ChannelStateWithInfo) => any
+);
+
+export function useChannelStateListener(
+    options: ChannelNameAndId,
     state?: Types.ChannelState | Types.ChannelState[],
+    listener?: (stateChange: ChannelStateWithInfo) => any
+): ChannelStateWithInfo;
+
+export function useChannelStateListener(
+    channelNameOrNameAndOptions: ChannelNameAndId | string,
+    stateOrListener?:
+        | Types.ChannelState
+        | Types.ChannelState[]
+        | ((stateChange: ChannelStateWithInfo) => any),
     listener?: (stateChange: ChannelStateWithInfo) => any
 ): ChannelStateWithInfo {
     const ably = useAbly(
@@ -27,11 +41,8 @@ export function useChannelStateListener(
 
     const channel =
         typeof channelNameOrNameAndOptions === 'string'
-            ? ably.channels.get(channelName)
-            : ably.channels.get(
-                  channelName,
-                  channelNameOrNameAndOptions.options
-              );
+            ? ably.channels.get(channelNameOrNameAndOptions)
+            : ably.channels.get(channelNameOrNameAndOptions.channelName);
 
     const [stateChangeInfo, setStateChangeInfo] =
         useState<ChannelStateWithInfo>({
@@ -42,10 +53,16 @@ export function useChannelStateListener(
 
     useEffect(() => {
         const handleStateChange = (stateChange: Types.ChannelStateChange) => {
+            if (typeof stateOrListener === 'function') {
+                listener = stateOrListener;
+                stateOrListener = undefined;
+            }
+
             if (
-                !state ||
-                state === stateChange.current ||
-                (Array.isArray(state) && state.includes(stateChange.current))
+                !stateOrListener ||
+                stateOrListener === stateChange.current ||
+                (Array.isArray(stateOrListener) &&
+                    stateOrListener.includes(stateChange.current))
             ) {
                 setStateChangeInfo({
                     current: stateChange.current,
@@ -68,7 +85,7 @@ export function useChannelStateListener(
         return () => {
             channel.off(handleStateChange);
         };
-    }, [channel, state, listener]);
+    }, [channel, stateOrListener, listener]);
 
     return stateChangeInfo;
 }
