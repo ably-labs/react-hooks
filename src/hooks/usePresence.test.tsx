@@ -1,5 +1,4 @@
 import React from 'react';
-import { it, beforeEach, describe, expect } from 'vitest';
 import { usePresence } from './usePresence';
 import { render, screen, act } from '@testing-library/react';
 import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';

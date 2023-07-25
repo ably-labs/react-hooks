@@ -13,7 +13,6 @@
         "skipLibCheck": true,
         "allowJs": true,
         "jsx": "react-jsx",
-        "lib": ["DOM", "DOM.Iterable", "ESNext"],
-        "types": ["vitest/globals"]
+        "lib": ["DOM", "DOM.Iterable", "ESNext"]
     }
 }
