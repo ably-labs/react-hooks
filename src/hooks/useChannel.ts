@@ -1,10 +1,10 @@
 import { Types } from 'ably';
 import { useEffect } from 'react';
-import { assertConfiguration, ChannelParameters } from '../AblyReactHooks.js';
+import { assertConfiguration, ChannelParameters } from '../AblyReactHooks';
 
 export type AblyMessageCallback = (message: Types.Message) => void;
 export type ChannelAndClient = [
-    channel: Types.RealtimeChannelCallbacks,
+    channel: Types.RealtimeChannelPromise,
     message: Types.RealtimePromise,
 ];
 
