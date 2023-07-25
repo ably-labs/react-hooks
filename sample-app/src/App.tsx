@@ -1,12 +1,7 @@
 import { Types } from 'ably';
 import React, { useState } from 'react';
-import { configureAbly, useChannel, usePresence } from '../../src/index';
+import { useChannel, usePresence } from '../../src/index';
 import './App.css';
-
-configureAbly({
-    key: import.meta.env.VITE_ABLY_API_KEY,
-    clientId: generateRandomId(),
-});
 
 function App() {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
@@ -60,10 +55,6 @@ function App() {
             <ul>{presentClients}</ul>
         </div>
     );
-}
-
-function generateRandomId() {
-    return Math.random().toString(36).substr(2, 9);
 }
 
 export default App;

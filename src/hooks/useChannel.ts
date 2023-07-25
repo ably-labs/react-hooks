@@ -1,11 +1,12 @@
 import { Types } from 'ably';
 import { useEffect } from 'react';
-import { assertConfiguration, ChannelParameters } from '../AblyReactHooks.js';
+import { ChannelParameters } from '../AblyReactHooks.js';
+import { useAbly } from './useAbly';
 
 export type AblyMessageCallback = (message: Types.Message) => void;
 export type ChannelAndClient = [
-    channel: Types.RealtimeChannelCallbacks,
-    message: Types.RealtimePromise,
+    channel: Types.RealtimeChannelPromise,
+    ably: Types.RealtimePromise,
 ];
 
 export function useChannel(
@@ -22,10 +23,11 @@ export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
     ...channelSubscriptionArguments: any[]
 ): ChannelAndClient {
-    const ably =
-        typeof channelNameOrNameAndOptions === 'string'
-            ? assertConfiguration()
-            : channelNameOrNameAndOptions.realtime || assertConfiguration();
+    const ably = useAbly(
+        typeof channelNameOrNameAndOptions === 'object'
+            ? channelNameOrNameAndOptions.id
+            : undefined
+    );
 
     const channelName =
         typeof channelNameOrNameAndOptions === 'string'

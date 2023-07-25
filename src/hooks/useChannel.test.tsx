@@ -1,12 +1,23 @@
 import React from 'react';
 import { it, beforeEach, describe, expect } from 'vitest';
-import { provideSdkInstance } from '../AblyReactHooks';
 import { useChannel } from './useChannel';
 import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';
 import { Types } from 'ably';
 import { act } from 'react-dom/test-utils';
+import { AblyProvider } from '../AblyProvider';
+
+function renderInCtxProvider(
+    client: FakeAblySdk,
+    children: React.ReactNode | React.ReactNode[]
+) {
+    return render(
+        <AblyProvider client={client as unknown as Types.RealtimePromise}>
+            {children}
+        </AblyProvider>
+    );
+}
 
 describe('useChannel', () => {
     let channels: FakeAblyChannels;
@@ -17,18 +28,23 @@ describe('useChannel', () => {
         channels = new FakeAblyChannels(['blah']);
         ablyClient = new FakeAblySdk().connectTo(channels);
         otherClient = new FakeAblySdk().connectTo(channels);
-        provideSdkInstance(ablyClient as any);
     });
 
     it('component can useChannel and renders nothing by default', async () => {
-        render(<UseChannelComponent></UseChannelComponent>);
+        renderInCtxProvider(
+            ablyClient,
+            <UseChannelComponent></UseChannelComponent>
+        );
         const messageUl = screen.getAllByRole('messages')[0];
 
         expect(messageUl.childElementCount).toBe(0);
     });
 
     it('component updates when message arrives', async () => {
-        render(<UseChannelComponent></UseChannelComponent>);
+        renderInCtxProvider(
+            ablyClient,
+            <UseChannelComponent></UseChannelComponent>
+        );
 
         await act(async () => {
             otherClient.channels.get('blah').publish({ text: 'message text' });
@@ -40,7 +56,10 @@ describe('useChannel', () => {
     });
 
     it('component updates when multiple messages arrive', async () => {
-        render(<UseChannelComponent></UseChannelComponent>);
+        renderInCtxProvider(
+            ablyClient,
+            <UseChannelComponent></UseChannelComponent>
+        );
 
         await act(async () => {
             otherClient.channels.get('blah').publish({ text: 'message text1' });
@@ -53,11 +72,17 @@ describe('useChannel', () => {
     });
 
     it('useChannel works with multiple clients', async () => {
-        render(
-            <UseChannelComponentMultipleClients
-                client1={ablyClient}
-                client2={otherClient}
-            ></UseChannelComponentMultipleClients>
+        renderInCtxProvider(
+            ablyClient,
+            <AblyProvider
+                client={otherClient as unknown as Types.RealtimePromise}
+                id="otherClient"
+            >
+                <UseChannelComponentMultipleClients
+                    client1={ablyClient}
+                    client2={otherClient}
+                ></UseChannelComponentMultipleClients>
+            </AblyProvider>
         );
 
         await act(async () => {
@@ -73,14 +98,11 @@ describe('useChannel', () => {
 
 const UseChannelComponentMultipleClients = ({ client1, client2 }) => {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
-    const [channel1] = useChannel(
-        { channelName: 'blah', realtime: client1 },
-        (message) => {
-            updateMessages((prev) => [...prev, message]);
-        }
-    );
+    const [channel1] = useChannel({ channelName: 'blah' }, (message) => {
+        updateMessages((prev) => [...prev, message]);
+    });
     const [channel2] = useChannel(
-        { channelName: 'bleh', realtime: client2 },
+        { channelName: 'bleh', id: 'otherClient' },
         (message) => {
             updateMessages((prev) => [...prev, message]);
         }
