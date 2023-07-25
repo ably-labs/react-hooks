@@ -63,19 +63,41 @@ It is strongly recommended that you use [Token Authentication](https://www.ably.
 
 Once you've added the package using `npm` to your project, you can use the hooks in your `react` code.
 
-Start by adding a reference to the hooks
+Start by connecting your app to Ably using the `AblyProvider` component. The options provided to the `AblyProvider` are the same options used for the Ably SDK - and requires either a `string` or an `AblyClientOptions`. You can use this configuration object to setup your API keys, or tokenAuthentication as you normally would. If you want to use the `usePresence` hook, you'll need to explicitly provide a `clientId`.
 
-```javascript
-import { configureAbly, useChannel } from "@ably-labs/react-hooks";
+The `AblyProvider` should be high in your component tree, wrapping every component which needs to access Ably.
+
+
+```jsx
+import { AblyProvider } from "@ably-labs/react-hooks";
+
+const options = {
+  key: "your-ably-api-key",
+  clientId: "me",
+}
+
+root.render(
+  <AblyProvider options={options}>
+    <App />
+  </AblyProvider>
+)
 ```
 
-Then you need to use the `configureAbly` function to create an instance of the `Ably` JavaScript SDK.
+You may also create your own client and pass it into the context provider.
 
-```javascript
-configureAbly({ key: "your-ably-api-key", clientId: generateRandomId() });
+The `Realtime` constructor provided by the library matches the method signature of the Ably SDK with promises - and requires either a `string` or an `AblyClientOptions`. You can use this configuration object to setup your API keys, or tokenAuthentication as you normally would. If you want to use the `usePresence` hook, you'll need to explicitly provide a `clientId`.
+
+```jsx
+import { Realtime } from "@ably-labs/react-hooks";
+
+const client = new Realtime({ key: "your-ably-api-key", clientId: 'me' });
+
+root.render(
+  <AblyProvider client={client}>
+    <App />
+  </AblyProvider>
+)
 ```
-
-`configureAbly` matches the method signature of the Ably SDK - and requires either a `string` or an `AblyClientOptions`. You can use this configuration object to setup your API keys, or tokenAuthentication as you normally would. If you want to use the `usePresence` hook, you'll need to explicitly provide a `clientId`.
 
 Once you've done this, you can use the `hooks` in your code. The simplest example is as follows:
 
@@ -239,14 +261,42 @@ interface MyPresenceType {
 
 `PresenceData` is a good way to store synchronised, per-client metadata, so types here are especially valuable.
 
-We also support providing your own `Realtime` instance to `usePresence`, which may be useful if you need to have more than one Ably client on the same page:
+### useAbly
+
+The useAbly hook lets you access the Ably client used by the AblyProvider context. This can be useful if you need to access ably-js APIs which aren't available through our react-hooks library.
 
 ```javascript
-import { useChannel, Realtime } from '@ably-labs/react-hooks'
+const client = useAbly();
 
-const realtime = new Realtime(options);
+client.authorize();
+```
 
-usePresence({ channelName: "your-channel-name", realtime: realtime }, (presenceUpdate) => {
+### Usage with multiple clients
+
+If you need to use multiple Ably clients on the same page, the easiest way to do so is to keep your clients in separate `AblyProvider` components. However, if you need to nest `AblyProvider`s, you can pass a string id for each client as a prop to the provider.
+
+```jsx
+root.render(
+  <AblyProvider options={options} id={'providerOne'}>
+    <AblyProvider options={options} id={'providerTwo'}>
+      <App />
+    </AblyProvider>
+  </AblyProvider>
+)
+```
+
+This id can then be passed in to each hook to specify which client to use.
+
+```javascript
+const ablyContextId = 'providerOne';
+
+const client = useAbly(ablyContextId);
+
+useChannel({ channelName: "your-channel-name", id: ablyContextId }, (message) => {
+    console.log(message);
+});
+
+usePresence({ channelName: "your-channel-name", id: ablyContextId }, (presenceUpdate) => {
     ...
 })
 ```
