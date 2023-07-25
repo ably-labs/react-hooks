@@ -1,5 +1,4 @@
 import React from 'react';
-import { it, beforeEach, describe, expect } from 'vitest';
 import { provideSdkInstance } from '../AblyReactHooks';
 import { useChannel } from './useChannel';
 import { useState } from 'react';
