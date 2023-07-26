@@ -2,71 +2,106 @@ import React from 'react';
 import { provideSdkInstance } from '../AblyReactHooks';
 import { useChannel } from './useChannel';
 import { useState } from 'react';
-import { render, screen } from '@testing-library/react';
-import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { Types } from 'ably';
-import { act } from 'react-dom/test-utils';
+import { TestApp } from '../test/testapp';
 
 describe('useChannel', () => {
-    let channels: FakeAblyChannels;
-    let ablyClient: FakeAblySdk;
-    let otherClient: FakeAblySdk;
+    let testApp: TestApp;
 
-    beforeEach(() => {
-        channels = new FakeAblyChannels(['blah']);
-        ablyClient = new FakeAblySdk().connectTo(channels);
-        otherClient = new FakeAblySdk().connectTo(channels);
-        provideSdkInstance(ablyClient as any);
+    beforeAll(async () => {
+        testApp = await TestApp.create();
     });
 
+    afterAll(async () => {
+        await testApp.delete();
+    }, 10_000);
+
     it('component can useChannel and renders nothing by default', async () => {
+        const client = await testApp.client();
+        provideSdkInstance(client);
         render(<UseChannelComponent></UseChannelComponent>);
         const messageUl = screen.getAllByRole('messages')[0];
 
         expect(messageUl.childElementCount).toBe(0);
+        client.close();
     });
 
     it('component updates when message arrives', async () => {
+        const client = await testApp.client();
+        const otherClient = await testApp.client();
+        provideSdkInstance(client);
         render(<UseChannelComponent></UseChannelComponent>);
 
         await act(async () => {
-            otherClient.channels.get('blah').publish({ text: 'message text' });
+            await otherClient.channels
+                .get('blah')
+                .publish('event', { text: 'message text' });
         });
 
         const messageUl = screen.getAllByRole('messages')[0];
-        expect(messageUl.childElementCount).toBe(1);
-        expect(messageUl.children[0].innerHTML).toBe('message text');
+
+        await waitFor(() => {
+            expect(messageUl.childElementCount).toBe(1);
+            expect(messageUl.children[0].innerHTML).toBe('message text');
+        });
+        client.close();
+        otherClient.close();
     });
 
     it('component updates when multiple messages arrive', async () => {
+        const client = await testApp.client();
+        const otherClient = await testApp.client();
+        provideSdkInstance(client);
         render(<UseChannelComponent></UseChannelComponent>);
 
         await act(async () => {
-            otherClient.channels.get('blah').publish({ text: 'message text1' });
-            otherClient.channels.get('blah').publish({ text: 'message text2' });
+            await otherClient.channels
+                .get('blah')
+                .publish('event', { text: 'message text1' });
+            await otherClient.channels
+                .get('blah')
+                .publish('event', { text: 'message text2' });
         });
 
         const messageUl = screen.getAllByRole('messages')[0];
-        expect(messageUl.children[0].innerHTML).toBe('message text1');
-        expect(messageUl.children[1].innerHTML).toBe('message text2');
+
+        await waitFor(() => {
+            expect(messageUl.children[0].innerHTML).toBe('message text1');
+            expect(messageUl.children[1].innerHTML).toBe('message text2');
+        });
+        client.close();
+        otherClient.close();
     });
 
     it('useChannel works with multiple clients', async () => {
+        const client = await testApp.client();
+        const otherClient = await testApp.client();
+        provideSdkInstance(client);
         render(
             <UseChannelComponentMultipleClients
-                client1={ablyClient}
+                client1={client}
                 client2={otherClient}
             ></UseChannelComponentMultipleClients>
         );
 
         await act(async () => {
-            ablyClient.channels.get('blah').publish({ text: 'message text1' });
-            otherClient.channels.get('bleh').publish({ text: 'message text2' });
+            await client.channels
+                .get('blah')
+                .publish('event', { text: 'message text1' });
+            await otherClient.channels
+                .get('bleh')
+                .publish('event', { text: 'message text2' });
         });
 
         const messageUl = screen.getAllByRole('messages')[0];
-        expect(messageUl.children[0].innerHTML).toBe('message text1');
-        expect(messageUl.children[1].innerHTML).toBe('message text2');
+
+        await waitFor(() => {
+            expect(messageUl.children[0].innerHTML).toBe('message text1');
+            expect(messageUl.children[1].innerHTML).toBe('message text2');
+        });
+        client.close();
+        otherClient.close();
     });
 });
 
