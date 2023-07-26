@@ -1,21 +1,34 @@
 import React from 'react';
 import { provideSdkInstance } from '../AblyReactHooks';
 import { usePresence } from './usePresence';
-import { render, screen, act } from '@testing-library/react';
-import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';
+import { render, screen, act, waitFor } from '@testing-library/react';
+import { Types } from 'ably';
+import { TestApp } from '../test/testapp';
 
 const testChannelName = 'testChannel';
 
 describe('usePresence', () => {
-    let channels: FakeAblyChannels;
-    let ablyClient: FakeAblySdk;
-    let otherClient: FakeAblySdk;
+    let testApp: TestApp;
+    let ablyClient: Types.RealtimePromise;
+    let otherClient: Types.RealtimePromise;
 
-    beforeEach(() => {
-        channels = new FakeAblyChannels([testChannelName]);
-        ablyClient = new FakeAblySdk().connectTo(channels);
-        otherClient = new FakeAblySdk().connectTo(channels);
-        provideSdkInstance(ablyClient as any);
+    beforeAll(async () => {
+        testApp = await TestApp.create();
+    });
+
+    beforeEach(async () => {
+        ablyClient = await testApp.client();
+        otherClient = await testApp.client();
+        provideSdkInstance(ablyClient);
+    });
+
+    afterEach(() => {
+        ablyClient.close();
+        otherClient.close();
+    });
+
+    afterAll(async () => {
+        await testApp.delete();
     });
 
     it('presence data is not visible on first render as it runs in an effect', async () => {

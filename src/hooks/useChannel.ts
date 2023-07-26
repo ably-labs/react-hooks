@@ -53,7 +53,10 @@ export function useChannel(
             // To solve this, we set a timer, and if all the listeners have been removed, we know that the component
             // has been removed for good and we can detatch the channel.
 
-            if (channel.listeners.length === 0) {
+            if (
+                channel.listeners.length === 0 &&
+                channel.state === 'attached'
+            ) {
                 await channel.detach();
             }
         }, 2500);
