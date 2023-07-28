@@ -99,7 +99,7 @@ const [channel, ably] = useChannel("your-channel-name", (message) => {
 });
 ```
 
-**Both the channel instance, and the Ably JavaScript SDK instance are returned from the useChannel call.**
+**Both the channel instance and the Ably JavaScript SDK instance are returned from the useChannel call.**
 
 `useChannel` really shines when combined with a regular react `useState` hook - for example, you could keep a list of messages in your app state, and use the `useChannel` hook to subscribe to a channel, and update the state when new messages arrive.
 
