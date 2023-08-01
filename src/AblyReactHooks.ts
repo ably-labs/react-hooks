@@ -1,7 +1,7 @@
 import Ably from "ably";
 import { Types } from "ably";
 
-export type ChannelNameAndOptions = { channelName: string; options?: Types.ChannelOptions; realtime?: Types.RealtimePromise }
+export type ChannelNameAndOptions = { channelName: string; options?: Types.ChannelOptions; realtime?: Types.RealtimePromise, subscribeOnly?: boolean }
 export type ChannelParameters =  string | ChannelNameAndOptions;
 
 const version = "2.1.1"
