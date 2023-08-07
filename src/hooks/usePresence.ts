@@ -1,6 +1,7 @@
 import { Types } from 'ably';
 import { useCallback, useEffect, useState } from 'react';
-import { assertConfiguration, ChannelParameters } from '../AblyReactHooks.js';
+import { ChannelParameters } from '../AblyReactHooks.js';
+import { useAbly } from './useAbly.js';
 
 export type PresenceDataAndPresenceUpdateFunction<T> = [
     presenceData: PresenceMessage<T>[],
@@ -19,10 +20,11 @@ export function usePresence<T = any>(
     messageOrPresenceObject?: T,
     onPresenceUpdated?: OnPresenceMessageReceived<T>
 ): PresenceDataAndPresenceUpdateFunction<T> {
-    const ably =
-        typeof channelNameOrNameAndOptions === 'string'
-            ? assertConfiguration()
-            : channelNameOrNameAndOptions.realtime || assertConfiguration();
+    const ably = useAbly(
+        typeof channelNameOrNameAndOptions === 'object'
+            ? channelNameOrNameAndOptions.id
+            : undefined
+    );
 
     const channelName =
         typeof channelNameOrNameAndOptions === 'string'

@@ -1,9 +1,21 @@
 import React from 'react';
 import { it, beforeEach, describe, expect } from 'vitest';
-import { provideSdkInstance } from '../AblyReactHooks';
 import { usePresence } from './usePresence';
 import { render, screen, act } from '@testing-library/react';
 import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';
+import { AblyProvider } from '../AblyProvider';
+import { Types } from 'ably';
+
+function renderInCtxProvider(
+    client: FakeAblySdk,
+    children: React.ReactNode | React.ReactNode[]
+) {
+    return render(
+        <AblyProvider client={client as unknown as Types.RealtimePromise}>
+            {children}
+        </AblyProvider>
+    );
+}
 
 const testChannelName = 'testChannel';
 
@@ -16,11 +28,13 @@ describe('usePresence', () => {
         channels = new FakeAblyChannels([testChannelName]);
         ablyClient = new FakeAblySdk().connectTo(channels);
         otherClient = new FakeAblySdk().connectTo(channels);
-        provideSdkInstance(ablyClient as any);
     });
 
     it('presence data is not visible on first render as it runs in an effect', async () => {
-        render(<UsePresenceComponent></UsePresenceComponent>);
+        renderInCtxProvider(
+            ablyClient,
+            <UsePresenceComponent></UsePresenceComponent>
+        );
 
         const values = screen.getByRole('presence').innerHTML;
         expect(values).toBe('');
@@ -32,7 +46,10 @@ describe('usePresence', () => {
     });
 
     it('presence data available after effect runs', async () => {
-        render(<UsePresenceComponent></UsePresenceComponent>);
+        renderInCtxProvider(
+            ablyClient,
+            <UsePresenceComponent></UsePresenceComponent>
+        );
 
         await act(async () => {
             await wait(2);
@@ -43,7 +60,10 @@ describe('usePresence', () => {
     });
 
     it('presence data updates when update function is triggered', async () => {
-        render(<UsePresenceComponent></UsePresenceComponent>);
+        renderInCtxProvider(
+            ablyClient,
+            <UsePresenceComponent></UsePresenceComponent>
+        );
 
         await act(async () => {
             const button = screen.getByText(/Update/i);
@@ -55,7 +75,10 @@ describe('usePresence', () => {
     });
 
     it('presence data respects updates made by other clients', async () => {
-        render(<UsePresenceComponent></UsePresenceComponent>);
+        renderInCtxProvider(
+            ablyClient,
+            <UsePresenceComponent></UsePresenceComponent>
+        );
 
         await act(async () => {
             otherClient.channels.get(testChannelName).presence.enter('boop');
@@ -69,7 +92,10 @@ describe('usePresence', () => {
     });
 
     it('presence API works with type information provided', async () => {
-        render(<TypedUsePresenceComponent></TypedUsePresenceComponent>);
+        renderInCtxProvider(
+            ablyClient,
+            <TypedUsePresenceComponent></TypedUsePresenceComponent>
+        );
 
         await act(async () => {
             await wait(2);
@@ -80,11 +106,17 @@ describe('usePresence', () => {
     });
 
     it('usePresence works with multiple clients', async () => {
-        render(
-            <UsePresenceComponentMultipleClients
-                client1={ablyClient}
-                client2={otherClient}
-            ></UsePresenceComponentMultipleClients>
+        renderInCtxProvider(
+            ablyClient,
+            <AblyProvider
+                id="otherClient"
+                client={otherClient as unknown as Types.RealtimePromise}
+            >
+                <UsePresenceComponentMultipleClients
+                    client1={ablyClient}
+                    client2={otherClient}
+                ></UsePresenceComponentMultipleClients>
+            </AblyProvider>
         );
 
         await act(async () => {
@@ -126,11 +158,11 @@ const UsePresenceComponent = () => {
 
 const UsePresenceComponentMultipleClients = ({ client1, client2 }) => {
     const [val1, update1] = usePresence(
-        { channelName: testChannelName, realtime: client1 },
+        { channelName: testChannelName },
         'foo'
     );
     const [val2, update2] = usePresence(
-        { channelName: testChannelName, realtime: client2 },
+        { channelName: testChannelName, id: 'otherClient' },
         'bar'
     );
 
