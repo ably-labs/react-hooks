@@ -12,15 +12,19 @@ const canUseSymbol =
  */
 export class Realtime extends Ably.Realtime.Promise {
     constructor(options: string | Types.ClientOptions) {
+        let opts: Types.ClientOptions;
+
         if (typeof options === 'string') {
-            options = {
+            opts = {
                 key: options,
             } as Types.ClientOptions;
+        } else {
+            opts = { ...options };
         }
 
-        (options as any).agents = { 'react-hooks': version };
+        (opts as any).agents = { 'react-hooks': version };
 
-        super(options);
+        super(opts);
     }
 }
 
