@@ -8,7 +8,7 @@ You can run the dev server from the terminal using:
 npm run start
 ```
 
-You'll need to provide an API key for the sample to work (or you'll just get a white page and some errors in the console). To do this, create the file `./src/.env` and add the following line:
+You'll need to provide an API key for the sample to work (or you'll just get a white page and some errors in the console). To do this, create the file `./sample-app/.env` and add the following line:
 
 ```.env
 VITE_ABLY_API_KEY=<your-api-key>
