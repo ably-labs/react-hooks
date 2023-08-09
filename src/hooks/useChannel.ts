@@ -1,5 +1,5 @@
 import { Types } from 'ably';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { ChannelParameters } from '../AblyReactHooks.js';
 import { useAbly } from './useAbly';
 
@@ -23,24 +23,20 @@ export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
     ...channelSubscriptionArguments: any[]
 ): ChannelAndClient {
-    const ably = useAbly(
+    const channelHookOptions =
         typeof channelNameOrNameAndOptions === 'object'
-            ? channelNameOrNameAndOptions.id
-            : undefined
-    );
-
-    const channelName =
-        typeof channelNameOrNameAndOptions === 'string'
             ? channelNameOrNameAndOptions
-            : channelNameOrNameAndOptions.channelName;
+            : { channelName: channelNameOrNameAndOptions };
 
-    const channel =
-        typeof channelNameOrNameAndOptions === 'string'
-            ? ably.channels.get(channelName)
-            : ably.channels.get(
-                  channelName,
-                  channelNameOrNameAndOptions.options
-              );
+    const ably = useAbly(channelHookOptions.id);
+
+    const { channelName, options: channelOptions } = channelHookOptions;
+    const channelOptionsRef = useRef(channelOptions);
+
+    const channel = useMemo(
+        () => ably.channels.get(channelName, channelOptionsRef.current),
+        [channelName]
+    );
 
     const onMount = async () => {
         await channel.subscribe.apply(channel, channelSubscriptionArguments);
@@ -60,6 +56,13 @@ export function useChannel(
             }
         }, 2500);
     };
+
+    useEffect(() => {
+        if (channelOptionsRef.current !== channelOptions) {
+            channelOptionsRef.current = channelOptions;
+            channel.setOptions(channelOptions);
+        }
+    }, [channelOptions]);
 
     const useEffectHook = () => {
         onMount();
