@@ -16,24 +16,97 @@ export class FakeAblySdk {
     }
 }
 
+type EventListener = (...args: any[]) => unknown;
+
+class EventEmitter {
+    listeners: Map<string | string[], EventListener[]>;
+    allEvtListeners: EventListener[];
+    constructor() {
+        this.listeners = new Map<string | string[], EventListener[]>();
+        this.allEvtListeners = [];
+    }
+
+    on(
+        eventOrListener: string | string[] | EventListener,
+        listener?: EventListener
+    ) {
+        if (eventOrListener && listener) {
+            if (!Array.isArray(eventOrListener)) {
+                eventOrListener = [eventOrListener as string];
+            }
+            eventOrListener.forEach((eventName) => {
+                const listenerArr = this.listeners.get(eventName as string);
+                if (listenerArr) {
+                    listenerArr.push(listener);
+                    return;
+                }
+                this.listeners.set(eventName as string | string[], [listener]);
+            });
+        } else {
+            this.allEvtListeners.push(eventOrListener as EventListener);
+        }
+    }
+
+    off(
+        eventOrListener: string | string[] | EventListener,
+        listener?: EventListener
+    ) {
+        if (eventOrListener && listener) {
+            const listenerArr = this.listeners.get(eventOrListener as string);
+            if (listenerArr) {
+                this.listeners.set(
+                    eventOrListener as string,
+                    listenerArr.filter((x) => x !== listener)
+                );
+                return;
+            }
+        } else {
+            this.allEvtListeners = this.allEvtListeners.filter(
+                (x) => x !== listener
+            );
+        }
+    }
+
+    emit(event: string, ...args: any[]) {
+        const listenerArr = this.listeners.get(event);
+        const allListeners: EventListener[] = [];
+        if (listenerArr) {
+            allListeners.push(...listenerArr);
+        }
+        allListeners.push(...this.allEvtListeners);
+        allListeners.forEach((listener) => {
+            listener(...args);
+        });
+    }
+}
+
 export class ClientChannelsCollection {
     private client: FakeAblySdk;
     private channels: FakeAblyChannels;
+    private _channelConnections: Map<string, ClientSingleChannelConnection>;
 
     constructor(client: FakeAblySdk, channels: FakeAblyChannels) {
         this.client = client;
         this.channels = channels;
+        this._channelConnections = new Map();
     }
 
     public get(name: string): ClientSingleChannelConnection {
-        return new ClientSingleChannelConnection(
-            this.client,
-            this.channels.get(name)
-        );
+        let channelConnection = this._channelConnections.get(name);
+        if (channelConnection) {
+            return channelConnection;
+        } else {
+            channelConnection = new ClientSingleChannelConnection(
+                this.client,
+                this.channels.get(name)
+            );
+            this._channelConnections.set(name, channelConnection);
+            return channelConnection;
+        }
     }
 }
 
-export class ClientSingleChannelConnection {
+export class ClientSingleChannelConnection extends EventEmitter {
     private client: FakeAblySdk;
     private channel: Channel;
 
@@ -41,6 +114,7 @@ export class ClientSingleChannelConnection {
     public state: string;
 
     constructor(client: FakeAblySdk, channel: Channel) {
+        super();
         this.client = client;
         this.channel = channel;
         this.presence = new ClientPresenceConnection(
