@@ -3,11 +3,13 @@ import { Types } from 'ably';
 export class FakeAblySdk {
     public clientId: string;
     public channels: ClientChannelsCollection;
+    public connection: Connection;
 
     constructor() {
         this.clientId =
             Math.random().toString(36).substring(2, 15) +
             Math.random().toString(36).substring(2, 15);
+        this.connection = new Connection();
     }
 
     public connectTo(channels: FakeAblyChannels) {
@@ -77,6 +79,15 @@ class EventEmitter {
         allListeners.forEach((listener) => {
             listener(...args);
         });
+    }
+}
+
+class Connection extends EventEmitter {
+    state: Types.ConnectionState;
+
+    constructor() {
+        super();
+        this.state = 'initialized';
     }
 }
 
