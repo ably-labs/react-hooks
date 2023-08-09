@@ -4,7 +4,7 @@ import {
     AblyProvider,
     useChannel,
     usePresence,
-    useConnectionState,
+    useConnectionStateListener,
     useChannelStateListener,
 } from '../../src/index';
 import './App.css';
@@ -23,17 +23,22 @@ function App() {
         }
     );
 
-    const connectionState = useConnectionState('your-channel-name');
-    const channelState = useChannelStateListener('your-channel-name');
-    const channelStateWithEvents = useChannelStateListener(
-        'your-channel-name',
-        ['detached']
-    );
+    const [connectionState, setConnectionState] = useState(ably.connection.state);
+
+    useConnectionStateListener((stateChange) => {
+      setConnectionState(stateChange.current)
+    });
 
     const [ablyErr, setAblyErr] = useState('');
+    const [channelState, setChannelState] = useState(channel.state);
+    const [previousChannelState, setPreviousChannelState] = useState<undefined | Types.ChannelState>();
+    const [channelStateReason, setChannelStateReason] = useState<undefined | Types.ErrorInfo>();
 
     useChannelStateListener('your-channel-name', 'detached', (stateChange) => {
         setAblyErr(JSON.stringify(stateChange.reason));
+        setChannelState(stateChange.current);
+        setPreviousChannelState(stateChange.previous);
+        setChannelStateReason(stateChange.reason ?? undefined);
     });
 
     const messagePreviews = messages.map((msg, index) => (
@@ -76,11 +81,11 @@ function App() {
 
             <h2>Channel State</h2>
             <h3>Current</h3>
-            <div>{channelState.current}</div>
+            <div>{channelState}</div>
             <h3>Previous</h3>
-            <div>{channelState.previous}</div>
+            <div>{previousChannelState}</div>
             <h3>Reason</h3>
-            <div>{JSON.stringify(channelState.reason)}</div>
+            <div>{JSON.stringify(channelStateReason)}</div>
 
             <h2>Ably error</h2>
             <h3>Reason</h3>
