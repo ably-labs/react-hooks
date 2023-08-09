@@ -261,6 +261,44 @@ interface MyPresenceType {
 
 `PresenceData` is a good way to store synchronised, per-client metadata, so types here are especially valuable.
 
+### useConnectionStateListener
+
+The `useConnectionStateListener` hook lets you attach a listener to be notified of [connection state changes](https://ably.com/docs/connect/states?lang=javascript). This can be useful for detecting when the client has lost connection.
+
+```javascript
+useConnectionStateListener((stateChange) => {
+  console.log(stateChange.current) // the new connection state
+  console.log(stateChange.previous) // the previous connection state
+  console.log(stateChange.reason) // if applicable, an error indicating the reason for the connection state change
+})
+```
+
+You can also pass in a filter to only listen to a set of connection states:
+
+```javascript
+useConnectionStateListener('failed', listener); // the listener only gets called when the connection state becomes failed
+useConnectionStateListener(['failed', 'suspended'], listener); // the listener only gets called when the connection state becomes failed or suspended
+```
+
+### useChannelStateListener
+
+The `useChannelStateListener` hook lets you attach a listener to be notified of [channel state changes](https://ably.com/docs/channels?lang=javascript#states). This can be useful for detecting when a channel error has occured.
+
+```javascript
+useChannelStateListener((stateChange) => {
+  console.log(stateChange.current) // the new channel state
+  console.log(stateChange.previous) // the previous channel state
+  console.log(stateChange.reason) // if applicable, an error indicating the reason for the channel state change
+})
+```
+
+You can also pass in a filter to only listen to a set of channel states:
+
+```javascript
+useChannelStateListener('failed', listener); // the listener only gets called when the channel state becomes failed
+useChannelStateListener(['failed', 'suspended'], listener); // the listener only gets called when the channel state becomes failed or suspended
+```
+
 ### useAbly
 
 The useAbly hook lets you access the Ably client used by the AblyProvider context. This can be useful if you need to access ably-js APIs which aren't available through our react-hooks library.
