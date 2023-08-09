@@ -29,12 +29,6 @@ export function useConnectionStateListener(
     const _id = typeof listener === 'string' ? listener : id;
     const ably = useAbly(_id);
 
-    const [stateChangeInfo, setStateChangeInfo] =
-        useState<Types.ConnectionStateChange>({
-            current: ably.connection.state,
-            previous: ably.connection.state,
-        });
-
     useEffect(() => {
         const handleStateChange = (
             stateChange: Types.ConnectionStateChange
@@ -50,12 +44,6 @@ export function useConnectionStateListener(
                 (Array.isArray(stateOrListener) &&
                     stateOrListener.includes(stateChange.current))
             ) {
-                setStateChangeInfo({
-                    current: stateChange.current,
-                    previous: stateChange.previous,
-                    reason: stateChange.reason,
-                });
-
                 if (listener) {
                     (listener as ConnectionStateListener)({
                         current: stateChange.current,
@@ -72,6 +60,4 @@ export function useConnectionStateListener(
             ably.connection.off(handleStateChange);
         };
     }, [ably, stateOrListener, listener]);
-
-    return stateChangeInfo;
 }
