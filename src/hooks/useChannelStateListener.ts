@@ -1,23 +1,19 @@
 import { Types } from 'ably';
 import { ChannelParameters } from '../AblyReactHooks';
-import { useEffect, useState } from 'react';
 import { useAbly } from './useAbly';
+import { useEventListener } from './useEventListener';
 
-export interface ChannelStateWithInfo {
-    current: Types.ChannelState;
-    previous: Types.ChannelState;
-    reason: Types.ErrorInfo | null;
-}
+type ChannelStateListener = (stateChange: Types.ChannelStateChange) => any;
 
 export function useChannelStateListener(
     channelNameOrNameAndOptions: ChannelParameters,
-    listener?: (stateChange: ChannelStateWithInfo) => any
+    listener?: ChannelStateListener
 );
 
 export function useChannelStateListener(
     channelNameOrNameAndOptions: ChannelParameters,
     state?: Types.ChannelState | Types.ChannelState[],
-    listener?: (stateChange: ChannelStateWithInfo) => any
+    listener?: ChannelStateListener
 );
 
 export function useChannelStateListener(
@@ -25,8 +21,8 @@ export function useChannelStateListener(
     stateOrListener?:
         | Types.ChannelState
         | Types.ChannelState[]
-        | ((stateChange: ChannelStateWithInfo) => any),
-    listener?: (stateChange: ChannelStateWithInfo) => any
+        | ChannelStateListener,
+    listener?: (stateChange: Types.ChannelStateChange) => any
 ) {
     const ably = useAbly(
         typeof channelNameOrNameAndOptions === 'object'
@@ -34,46 +30,25 @@ export function useChannelStateListener(
             : undefined
     );
 
-    const channelName =
-        typeof channelNameOrNameAndOptions === 'string'
-            ? channelNameOrNameAndOptions
-            : channelNameOrNameAndOptions.channelName;
-
     const channel =
         typeof channelNameOrNameAndOptions === 'string'
-            ? ably.channels.get(channelName)
+            ? ably.channels.get(channelNameOrNameAndOptions)
             : ably.channels.get(
-                  channelName,
+                  channelNameOrNameAndOptions.channelName,
                   channelNameOrNameAndOptions.options
               );
 
-    useEffect(() => {
-        const handleStateChange = (stateChange: Types.ChannelStateChange) => {
-            if (typeof stateOrListener === 'function') {
-                listener = stateOrListener;
-                stateOrListener = undefined;
-            }
+    const _listener =
+        typeof listener === 'function'
+            ? listener
+            : (stateOrListener as ChannelStateListener);
 
-            if (
-                !stateOrListener ||
-                stateOrListener === stateChange.current ||
-                (Array.isArray(stateOrListener) &&
-                    stateOrListener.includes(stateChange.current))
-            ) {
-                if (listener) {
-                    listener({
-                        current: stateChange.current,
-                        previous: stateChange.previous,
-                        reason: stateChange.reason || null,
-                    });
-                }
-            }
-        };
+    const state =
+        typeof stateOrListener !== 'function' ? stateOrListener : undefined;
 
-        channel.on(handleStateChange);
-
-        return () => {
-            channel.off(handleStateChange);
-        };
-    }, [channel, stateOrListener, listener]);
+    useEventListener<Types.ChannelState, Types.ChannelStateChange>(
+        channel,
+        _listener,
+        state
+    );
 }

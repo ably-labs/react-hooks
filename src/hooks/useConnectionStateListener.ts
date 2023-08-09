@@ -1,7 +1,7 @@
 import { Types } from 'ably';
 import { ChannelParameters } from '../AblyReactHooks';
-import { useEffect, useState } from 'react';
 import { useAbly } from './useAbly';
+import { useEventListener } from './useEventListener';
 
 type ConnectionStateListener = (
     stateChange: Types.ConnectionStateChange
@@ -23,41 +23,22 @@ export function useConnectionStateListener(
         | Types.ConnectionState
         | Types.ConnectionState[]
         | ConnectionStateListener,
-    listener?: string | ConnectionStateListener,
+    listenerOrId?: string | ConnectionStateListener,
     id: string = 'default'
 ) {
-    const _id = typeof listener === 'string' ? listener : id;
+    const _id = typeof listenerOrId === 'string' ? listenerOrId : id;
     const ably = useAbly(_id);
 
-    useEffect(() => {
-        const handleStateChange = (
-            stateChange: Types.ConnectionStateChange
-        ) => {
-            if (typeof stateOrListener === 'function') {
-                listener = stateOrListener;
-                stateOrListener = undefined;
-            }
+    const listener =
+        typeof listenerOrId === 'function'
+            ? listenerOrId
+            : (stateOrListener as ConnectionStateListener);
+    const state =
+        typeof stateOrListener !== 'function' ? stateOrListener : undefined;
 
-            if (
-                !stateOrListener ||
-                stateOrListener === stateChange.current ||
-                (Array.isArray(stateOrListener) &&
-                    stateOrListener.includes(stateChange.current))
-            ) {
-                if (listener) {
-                    (listener as ConnectionStateListener)({
-                        current: stateChange.current,
-                        previous: stateChange.previous,
-                        reason: stateChange.reason,
-                    });
-                }
-            }
-        };
-
-        ably.connection.on(handleStateChange);
-
-        return () => {
-            ably.connection.off(handleStateChange);
-        };
-    }, [ably, stateOrListener, listener]);
+    useEventListener<Types.ConnectionState, Types.ConnectionStateChange>(
+        ably.connection,
+        listener,
+        state
+    );
 }
