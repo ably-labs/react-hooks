@@ -1,7 +1,7 @@
 import { Types } from 'ably';
 import { useCallback, useEffect, useState } from 'react';
-import { ChannelParameters } from '../AblyReactHooks.js';
-import { useAbly } from './useAbly.js';
+import { ChannelParameters } from '../AblyReactHooks';
+import { useAbly } from './useAbly';
 
 export type PresenceDataAndPresenceUpdateFunction<T> = [
     presenceData: PresenceMessage<T>[],
