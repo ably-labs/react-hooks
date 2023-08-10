@@ -5,7 +5,7 @@ import { useAbly } from './useAbly.js';
 
 export type PresenceDataAndPresenceUpdateFunction<T> = [
     presenceData: PresenceMessage<T>[],
-    updateStatus: (messageOrPresenceObject: T) => void,
+    updateStatus: (messageOrPresenceObject: T) => void
 ];
 
 export type OnPresenceMessageReceived<T> = (
@@ -20,34 +20,23 @@ export function usePresence<T = any>(
     messageOrPresenceObject?: T,
     onPresenceUpdated?: OnPresenceMessageReceived<T>
 ): PresenceDataAndPresenceUpdateFunction<T> {
-    const ably = useAbly(
+    const params =
         typeof channelNameOrNameAndOptions === 'object'
-            ? channelNameOrNameAndOptions.id
-            : undefined
-    );
-
-    const channelName =
-        typeof channelNameOrNameAndOptions === 'string'
             ? channelNameOrNameAndOptions
-            : channelNameOrNameAndOptions.channelName;
+            : { channelName: channelNameOrNameAndOptions };
 
-    const channel =
-        typeof channelNameOrNameAndOptions === 'string'
-            ? ably.channels.get(channelName)
-            : ably.channels.get(
-                  channelName,
-                  channelNameOrNameAndOptions.options
-              );
+    const ably = useAbly(params.id);
 
     const subscribeOnly =
         typeof channelNameOrNameAndOptions === 'string'
             ? false
-            : channelNameOrNameAndOptions.subscribeOnly;
+            : params.subscribeOnly;
 
-    const [presenceData, updatePresenceData] = useState([]) as [
-        Array<PresenceMessage<T>>,
-        UseStatePresenceUpdate,
-    ];
+    const channel = ably.channels.get(params.channelName, params.options);
+
+    const [presenceData, updatePresenceData] = useState<
+        Array<PresenceMessage<T>>
+    >([]);
 
     const updatePresence = async (message?: Types.PresenceMessage) => {
         const snapshot = await channel.presence.get();

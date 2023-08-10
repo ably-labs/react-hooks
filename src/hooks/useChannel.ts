@@ -6,7 +6,7 @@ import { useAbly } from './useAbly';
 export type AblyMessageCallback = (message: Types.Message) => void;
 export type ChannelAndClient = [
     channel: Types.RealtimeChannelPromise,
-    ably: Types.RealtimePromise,
+    ably: Types.RealtimePromise
 ];
 
 export function useChannel(
@@ -37,7 +37,6 @@ export function useChannel(
         () => ably.channels.get(channelName, channelOptionsRef.current),
         [channelName]
     );
-
     const onMount = async () => {
         await channel.subscribe.apply(channel, channelSubscriptionArguments);
     };
@@ -71,7 +70,7 @@ export function useChannel(
         };
     };
 
-    useEffect(useEffectHook, [channelName]);
+    useEffect(useEffectHook, [channelHookOptions.channelName]);
 
     return [channel, ably];
 }
