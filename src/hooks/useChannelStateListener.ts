@@ -18,23 +18,21 @@ export function useChannelStateListener(
 );
 
 export function useChannelStateListener(
-    channelNameOrNameAndOptions: ChannelNameAndId | string,
+    channelNameOrNameAndId: ChannelNameAndId | string,
     stateOrListener?:
         | Types.ChannelState
         | Types.ChannelState[]
         | ChannelStateListener,
     listener?: (stateChange: Types.ChannelStateChange) => any
 ) {
-    const ably = useAbly(
-        typeof channelNameOrNameAndOptions === 'object'
-            ? channelNameOrNameAndOptions.id
-            : undefined
-    );
+    const channelName =
+        typeof channelNameOrNameAndId === 'string'
+            ? channelNameOrNameAndId
+            : channelNameOrNameAndId.id;
+    const id = (channelNameOrNameAndId as ChannelNameAndId)?.id;
 
-    const channel =
-        typeof channelNameOrNameAndOptions === 'string'
-            ? ably.channels.get(channelNameOrNameAndOptions)
-            : ably.channels.get(channelNameOrNameAndOptions.channelName);
+    const ably = useAbly(id);
+    const channel = ably.channels.get(channelName);
 
     const _listener =
         typeof listener === 'function'
