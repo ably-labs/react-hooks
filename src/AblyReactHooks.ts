@@ -5,4 +5,10 @@ export type ChannelNameAndOptions = {
     options?: Types.ChannelOptions;
     id?: string;
 };
+
+export type ChannelNameAndId = {
+    channelName: string;
+    id?: string;
+};
+
 export type ChannelParameters = string | ChannelNameAndOptions;
