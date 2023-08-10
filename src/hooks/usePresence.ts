@@ -39,6 +39,11 @@ export function usePresence<T = any>(
                   channelNameOrNameAndOptions.options
               );
 
+    const subscribeOnly =
+        typeof channelNameOrNameAndOptions === 'string'
+            ? false
+            : channelNameOrNameAndOptions.subscribeOnly;
+
     const [presenceData, updatePresenceData] = useState([]) as [
         Array<PresenceMessage<T>>,
         UseStatePresenceUpdate,
@@ -56,7 +61,9 @@ export function usePresence<T = any>(
         channel.presence.subscribe('leave', updatePresence);
         channel.presence.subscribe('update', updatePresence);
 
-        await channel.presence.enter(messageOrPresenceObject);
+        if (!subscribeOnly) {
+            await channel.presence.enter(messageOrPresenceObject);
+        }
 
         const snapshot = await channel.presence.get();
         updatePresenceData(snapshot);
@@ -64,7 +71,9 @@ export function usePresence<T = any>(
 
     const onUnmount = () => {
         if (channel.state == 'attached') {
-            channel.presence.leave();
+            if (!subscribeOnly) {
+                channel.presence.leave();
+            }
         }
         channel.presence.unsubscribe('enter');
         channel.presence.unsubscribe('leave');
@@ -82,7 +91,13 @@ export function usePresence<T = any>(
 
     const updateStatus = useCallback(
         (messageOrPresenceObject: T) => {
-            channel.presence.update(messageOrPresenceObject);
+            if (!subscribeOnly) {
+                channel.presence.update(messageOrPresenceObject);
+            } else {
+                throw new Error(
+                    'updateStatus can not be called while using the hook in subscribeOnly mode'
+                );
+            }
         },
         [channel]
     );
