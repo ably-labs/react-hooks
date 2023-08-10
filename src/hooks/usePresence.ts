@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { ChannelParameters } from '../AblyReactHooks.js';
 import { useAbly } from './useAbly.js';
 
-export type PresenceDataAndPresenceUpdateFunction<T> = [
-    presenceData: PresenceMessage<T>[],
-    updateStatus: (messageOrPresenceObject: T) => void
-];
+export interface PresenceResult<T> {
+    presenceData: PresenceMessage<T>[];
+    updateStatus: (messageOrPresenceObject: T) => void;
+}
 
 export type OnPresenceMessageReceived<T> = (
     presenceData: PresenceMessage<T>
@@ -19,7 +19,7 @@ export function usePresence<T = any>(
     channelNameOrNameAndOptions: ChannelParameters,
     messageOrPresenceObject?: T,
     onPresenceUpdated?: OnPresenceMessageReceived<T>
-): PresenceDataAndPresenceUpdateFunction<T> {
+): PresenceResult<T> {
     const params =
         typeof channelNameOrNameAndOptions === 'object'
             ? channelNameOrNameAndOptions
@@ -91,7 +91,7 @@ export function usePresence<T = any>(
         [channel]
     );
 
-    return [presenceData, updateStatus];
+    return { presenceData, updateStatus };
 }
 
 interface PresenceMessage<T = any> {

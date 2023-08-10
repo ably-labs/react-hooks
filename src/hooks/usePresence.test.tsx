@@ -132,9 +132,9 @@ describe('usePresence', () => {
 });
 
 const UsePresenceComponent = () => {
-    const [val, update] = usePresence(testChannelName, 'bar');
+    const { presenceData, updateStatus } = usePresence(testChannelName, 'bar');
 
-    const presentUsers = val.map((presence, index) => {
+    const presentUsers = presenceData.map((presence, index) => {
         return (
             <li key={index}>
                 {presence.clientId} - {JSON.stringify(presence)}
@@ -146,7 +146,7 @@ const UsePresenceComponent = () => {
         <>
             <button
                 onClick={() => {
-                    update('baz');
+                    updateStatus('baz');
                 }}
             >
                 Update
@@ -157,11 +157,11 @@ const UsePresenceComponent = () => {
 };
 
 const UsePresenceComponentMultipleClients = ({ client1, client2 }) => {
-    const [val1, update1] = usePresence(
+    const { presenceData: val1, updateStatus: update1 } = usePresence(
         { channelName: testChannelName },
         'foo'
     );
-    const [val2, update2] = usePresence(
+    const { presenceData: val2, updateStatus: update2 } = usePresence(
         { channelName: testChannelName, id: 'otherClient' },
         'bar'
     );
@@ -194,11 +194,11 @@ interface MyPresenceType {
 }
 
 const TypedUsePresenceComponent = () => {
-    const [val] = usePresence<MyPresenceType>('testChannelName', {
+    const { presenceData } = usePresence<MyPresenceType>('testChannelName', {
         foo: 'bar',
     });
 
-    return <div role="presence">{JSON.stringify(val)}</div>;
+    return <div role="presence">{JSON.stringify(presenceData)}</div>;
 };
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -102,7 +102,7 @@ root.render(
 Once you've done this, you can use the `hooks` in your code. The simplest example is as follows:
 
 ```javascript
-const [channel] = useChannel("your-channel-name", (message) => {
+const { channel } = useChannel("your-channel-name", (message) => {
     console.log(message);
 });
 ```
@@ -116,7 +116,7 @@ Every time a message is sent to `your-channel-name` it'll be logged to the conso
 The useChannel hook lets you subscribe to a channel and receive messages from it.
 
 ```javascript
-const [channel, ably] = useChannel("your-channel-name", (message) => {
+const { channel, ably } = useChannel("your-channel-name", (message) => {
     console.log(message);
 });
 ```
@@ -127,7 +127,7 @@ const [channel, ably] = useChannel("your-channel-name", (message) => {
 
 ```javascript
 const [messages, updateMessages] = useState([]);
-const [channel] = useChannel("your-channel-name", (message) => {
+const { channel } = useChannel("your-channel-name", (message) => {
     updateMessages((prev) => [...prev, message]);
 });
 
@@ -138,7 +138,7 @@ const messagePreviews = messages.map((msg, index) => <li key={index}>{msg.data.s
 `useChannel` supports all of the parameter combinations of a regular call to `channel.subscribe`, so you can filter the messages you subscribe to by providing a `message type` to the `useChannel` function:
 
 ```javascript
-const [channel] = useChannel("your-channel-name", "test-message", (message) => {
+const { channel } = useChannel("your-channel-name", "test-message", (message) => {
     console.log(message); // Only logs messages sent using the `test-message` message type
 });
 ```
@@ -154,7 +154,7 @@ Because we're returning the channel instance, and Ably SDK instance from our `us
 For example, you could retrieve history like this:
 
 ```javascript
-const [channel] = useChannel("your-channel-name", (message) => {
+const { channel } = useChannel("your-channel-name", (message) => {
     console.log(message);
 });
 
@@ -168,7 +168,7 @@ It's also worth highlighting that the `useChannel` hook supports all of the addi
 This means you can use features like `rewind`:
 
 ```javascript
-const [channel] = useChannel("[?rewind=100]your-channel-name", (message) => {
+const { channel } = useChannel("[?rewind=100]your-channel-name", (message) => {
     // This call will rewind 100 messages
     console.log(message);
 });
@@ -177,7 +177,7 @@ const [channel] = useChannel("[?rewind=100]your-channel-name", (message) => {
 We support providing [ChannelOptions](https://ably.com/docs/api/realtime-sdk/types#channel-options) to the `useChannel` hook:
 
 ```javascript
-const [channel] = useChannel({ channelName: "your-channel-name", options: { ... } }, (message) => {
+const { channel } = useChannel({ channelName: "your-channel-name", options: { ... } }, (message) => {
     ...
 });
 ```
@@ -205,7 +205,7 @@ The usePresence hook lets you subscribe to presence events on a channel - this w
 **Please note** that fetching present members is executed as an effect, so it'll load in *after* your component renders for the first time.
 
 ```javascript
-const [presenceData, updateStatus] = usePresence("your-channel-name");
+const { presenceData, updateStatus } = usePresence("your-channel-name");
 
 // Convert presence data to list items to render    
 const peers = presenceData.map((msg, index) => <li key={index}>{msg.clientId}: {msg.data}</li>);
@@ -216,7 +216,7 @@ const peers = presenceData.map((msg, index) => <li key={index}>{msg.clientId}: {
 You can optionally provide a string when you `usePresence` to set an initial `presence data` string.
 
 ```javascript
-const [presenceData, updateStatus] = usePresence("your-channel-name", "initial state");
+const { presenceData, updateStatus } = usePresence("your-channel-name", "initial state");
 
 // The `updateStatus` function can be used to update the presence data for the current client
 updateStatus("new status");
@@ -227,7 +227,7 @@ The new state will be sent to the channel, and any other clients subscribed to t
 If you don't want to use the `presenceData` returned from usePresence, you can configure a callback
 
 ```javascript
-const [_, updateStatus] = usePresence("your-channel-name", "initial state", (presenceUpdate) => {
+const { updateStatus } = usePresence("your-channel-name", "initial state", (presenceUpdate) => {
     console.log(presenceUpdate);
 });
 ```
@@ -245,7 +245,7 @@ const TypedUsePresenceComponent = () => {
     // In this example MyPresenceType will be checked - if omitted, the shape of the initial 
     // value will be used ...and if that's omitted, `any` will be the default.
 
-    const [val] = usePresence<MyPresenceType>("testChannelName", { foo: "bar" });
+    const { val } = usePresence<MyPresenceType>("testChannelName", { foo: "bar" });
 
     return (
         <div role='presence'>

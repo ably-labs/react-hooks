@@ -11,11 +11,11 @@ import './App.css';
 
 function App() {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
-    const [channel, ably] = useChannel('your-channel-name', (message) => {
+    const { channel, ably } = useChannel('your-channel-name', (message) => {
         updateMessages((prev) => [...prev, message]);
     });
 
-    const [presenceData, updateStatus] = usePresence(
+    const { presenceData, updateStatus } = usePresence(
         'your-channel-name',
         { foo: 'bar' },
         (update) => {

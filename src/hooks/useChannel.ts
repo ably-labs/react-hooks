@@ -4,25 +4,26 @@ import { ChannelParameters } from '../AblyReactHooks.js';
 import { useAbly } from './useAbly';
 
 export type AblyMessageCallback = (message: Types.Message) => void;
-export type ChannelAndClient = [
-    channel: Types.RealtimeChannelPromise,
-    ably: Types.RealtimePromise
-];
+
+export interface ChannelResult {
+    channel: Types.RealtimeChannelPromise;
+    ably: Types.RealtimePromise;
+}
 
 export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
     callbackOnMessage: AblyMessageCallback
-): ChannelAndClient;
+): ChannelResult;
 export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
     event: string,
     callbackOnMessage: AblyMessageCallback
-): ChannelAndClient;
+): ChannelResult;
 
 export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
     ...channelSubscriptionArguments: any[]
-): ChannelAndClient {
+): ChannelResult {
     const channelHookOptions =
         typeof channelNameOrNameAndOptions === 'object'
             ? channelNameOrNameAndOptions
@@ -72,5 +73,5 @@ export function useChannel(
 
     useEffect(useEffectHook, [channelHookOptions.channelName]);
 
-    return [channel, ably];
+    return { channel, ably };
 }

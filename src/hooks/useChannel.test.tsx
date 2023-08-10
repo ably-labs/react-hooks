@@ -98,10 +98,13 @@ describe('useChannel', () => {
 
 const UseChannelComponentMultipleClients = ({ client1, client2 }) => {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
-    const [channel1] = useChannel({ channelName: 'blah' }, (message) => {
-        updateMessages((prev) => [...prev, message]);
-    });
-    const [channel2] = useChannel(
+    const { channel: channel1 } = useChannel(
+        { channelName: 'blah' },
+        (message) => {
+            updateMessages((prev) => [...prev, message]);
+        }
+    );
+    const { channel: channel2 } = useChannel(
         { channelName: 'bleh', id: 'otherClient' },
         (message) => {
             updateMessages((prev) => [...prev, message]);
@@ -117,7 +120,7 @@ const UseChannelComponentMultipleClients = ({ client1, client2 }) => {
 
 const UseChannelComponent = () => {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
-    const [channel, ably] = useChannel('blah', (message) => {
+    const { channel, ably } = useChannel('blah', (message) => {
         updateMessages((prev) => [...prev, message]);
     });
 
