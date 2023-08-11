@@ -28,7 +28,7 @@ export function useChannelStateListener(
     const channelName =
         typeof channelNameOrNameAndId === 'string'
             ? channelNameOrNameAndId
-            : channelNameOrNameAndId.id;
+            : channelNameOrNameAndId.channelName;
     const id = (channelNameOrNameAndId as ChannelNameAndId)?.id;
 
     const ably = useAbly(id);
