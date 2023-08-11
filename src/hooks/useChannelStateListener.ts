@@ -12,7 +12,7 @@ export function useChannelStateListener(
 );
 
 export function useChannelStateListener(
-    options: ChannelNameAndId,
+    options: ChannelNameAndId | string,
     state?: Types.ChannelState | Types.ChannelState[],
     listener?: ChannelStateListener
 );
