@@ -22,7 +22,7 @@ The hooks provide a simplified syntax for interacting with Ably, and manage the 
 - [Usage](#usage)
   - [useChannel](#usechannel)
   - [usePresence](#usepresence)
-- [Developer Notes](#developer-notes)
+- [Contributing](./CONTRIBUTING.md)
 
 <!-- /code_chunk_output -->
 ---
