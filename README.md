@@ -309,6 +309,34 @@ const client = useAbly();
 client.authorize();
 ```
 
+### Error Handling
+
+When using the Ably react hooks, your Ably client may encounter a variety of errors, for example if it doesn't have permissions to attach to a channel it may encounter a channel error, or if it loses connection from the Ably network it may encounter a connection error.
+
+To allow you to handle these errors, the `useChannel` and `usePresence` hooks return connection and channel errors so that you can react to them in your components: 
+
+```jsx
+const { connectionError, channelError } = useChannel('my_channel', messageHandler);
+
+if (connectionError) {
+  // TODO: handle connection errors
+} else if (channelError) {
+  // TODO: handle channel errors
+} else {
+  return <AblyChannelComponent />
+}
+```
+
+Alternatively, you can also pass callbacks to the hooks to be called when the client encounters an error:
+
+```js
+useChannel({
+  channelName: 'my_channel',
+  onConnectionError: (err) => { /* handle connection error */ },
+  onChannelError: (err) => { /* handle channel error */ },
+}, messageHandler);
+```
+
 ### Usage with multiple clients
 
 If you need to use multiple Ably clients on the same page, the easiest way to do so is to keep your clients in separate `AblyProvider` components. However, if you need to nest `AblyProvider`s, you can pass a string id for each client as a prop to the provider.

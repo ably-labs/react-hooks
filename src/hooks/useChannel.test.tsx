@@ -1,5 +1,5 @@
 import React from 'react';
-import { it, beforeEach, describe, expect } from 'vitest';
+import { it, beforeEach, describe, expect, vi } from 'vitest';
 import { useChannel } from './useChannel';
 import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
@@ -94,6 +94,58 @@ describe('useChannel', () => {
         expect(messageUl.children[0].innerHTML).toBe('message text1');
         expect(messageUl.children[1].innerHTML).toBe('message text2');
     });
+
+    it('handles channel errors', async () => {
+        const onChannelError = vi.fn();
+        const reason = { message: 'foo' };
+
+        renderInCtxProvider(
+            ablyClient,
+            <UseChannelStateErrorsComponent
+                onChannelError={onChannelError}
+            ></UseChannelStateErrorsComponent>
+        );
+
+        const channelErrorElem = screen.getByRole('channelError');
+        expect(onChannelError).toHaveBeenCalledTimes(0);
+        expect(channelErrorElem.innerHTML).toEqual('');
+
+        await act(async () => {
+            ablyClient.channels.get('blah').emit('failed', {
+                reason,
+            });
+        });
+
+        expect(channelErrorElem.innerHTML).toEqual(reason.message);
+        expect(onChannelError).toHaveBeenCalledTimes(1);
+        expect(onChannelError).toHaveBeenCalledWith(reason);
+    });
+
+    it('handles connection errors', async () => {
+        const onConnectionError = vi.fn();
+        const reason = { message: 'foo' };
+
+        renderInCtxProvider(
+            ablyClient,
+            <UseChannelStateErrorsComponent
+                onConnectionError={onConnectionError}
+            ></UseChannelStateErrorsComponent>
+        );
+
+        const connectionErrorElem = screen.getByRole('connectionError');
+        expect(onConnectionError).toHaveBeenCalledTimes(0);
+        expect(connectionErrorElem.innerHTML).toEqual('');
+
+        await act(async () => {
+            ablyClient.connection.emit('failed', {
+                reason,
+            });
+        });
+
+        expect(connectionErrorElem.innerHTML).toEqual(reason.message);
+        expect(onConnectionError).toHaveBeenCalledTimes(1);
+        expect(onConnectionError).toHaveBeenCalledWith(reason);
+    });
 });
 
 const UseChannelComponentMultipleClients = ({ client1, client2 }) => {
@@ -129,4 +181,26 @@ const UseChannelComponent = () => {
     ));
 
     return <ul role="messages">{messagePreviews}</ul>;
+};
+
+interface UseChannelStateErrorsComponentProps {
+    onConnectionError?: (err: Types.ErrorInfo) => unknown;
+    onChannelError?: (err: Types.ErrorInfo) => unknown;
+}
+
+const UseChannelStateErrorsComponent = ({
+    onConnectionError,
+    onChannelError,
+}: UseChannelStateErrorsComponentProps) => {
+    const { connectionError, channelError } = useChannel(
+        { channelName: 'blah', onConnectionError, onChannelError },
+        () => {}
+    );
+
+    return (
+        <>
+            <p role="connectionError">{connectionError?.message}</p>
+            <p role="channelError">{channelError?.message}</p>
+        </>
+    );
 };

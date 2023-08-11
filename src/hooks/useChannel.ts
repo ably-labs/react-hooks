@@ -1,13 +1,18 @@
 import { Types } from 'ably';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { ChannelParameters } from '../AblyReactHooks.js';
 import { useAbly } from './useAbly';
+import { useConnectionStateListener } from './useConnectionStateListener';
+import { useChannelStateListener } from './useChannelStateListener';
+import { useStateErrors } from './useStateErrors';
 
 export type AblyMessageCallback = (message: Types.Message) => void;
 
 export interface ChannelResult {
     channel: Types.RealtimeChannelPromise;
     ably: Types.RealtimePromise;
+    connectionError: Types.ErrorInfo | null;
+    channelError: Types.ErrorInfo | null;
 }
 
 export function useChannel(
@@ -38,6 +43,10 @@ export function useChannel(
         () => ably.channels.get(channelName, channelOptionsRef.current),
         [channelName]
     );
+
+    const { connectionError, channelError } =
+        useStateErrors(channelHookOptions);
+
     const onMount = async () => {
         await channel.subscribe.apply(channel, channelSubscriptionArguments);
     };
@@ -73,5 +82,5 @@ export function useChannel(
 
     useEffect(useEffectHook, [channelHookOptions.channelName]);
 
-    return { channel, ably };
+    return { channel, ably, connectionError, channelError };
 }
