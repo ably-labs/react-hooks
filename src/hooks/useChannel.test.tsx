@@ -78,10 +78,7 @@ describe('useChannel', () => {
                 client={otherClient as unknown as Types.RealtimePromise}
                 id="otherClient"
             >
-                <UseChannelComponentMultipleClients
-                    client1={ablyClient}
-                    client2={otherClient}
-                ></UseChannelComponentMultipleClients>
+                <UseChannelComponentMultipleClients />
             </AblyProvider>
         );
 
@@ -148,20 +145,14 @@ describe('useChannel', () => {
     });
 });
 
-const UseChannelComponentMultipleClients = ({ client1, client2 }) => {
+const UseChannelComponentMultipleClients = () => {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
-    const { channel: channel1 } = useChannel(
-        { channelName: 'blah' },
-        (message) => {
-            updateMessages((prev) => [...prev, message]);
-        }
-    );
-    const { channel: channel2 } = useChannel(
-        { channelName: 'bleh', id: 'otherClient' },
-        (message) => {
-            updateMessages((prev) => [...prev, message]);
-        }
-    );
+    useChannel({ channelName: 'blah' }, (message) => {
+        updateMessages((prev) => [...prev, message]);
+    });
+    useChannel({ channelName: 'bleh', id: 'otherClient' }, (message) => {
+        updateMessages((prev) => [...prev, message]);
+    });
 
     const messagePreviews = messages.map((msg, index) => (
         <li key={index}>{msg.data.text}</li>
@@ -172,7 +163,7 @@ const UseChannelComponentMultipleClients = ({ client1, client2 }) => {
 
 const UseChannelComponent = () => {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
-    const { channel, ably } = useChannel('blah', (message) => {
+    useChannel('blah', (message) => {
         updateMessages((prev) => [...prev, message]);
     });
 

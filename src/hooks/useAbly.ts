@@ -1,6 +1,6 @@
 import { Types } from 'ably';
 import React from 'react';
-import { contextKey, getContext } from '../AblyProvider';
+import { getContext } from '../AblyProvider';
 
 export function useAbly(id: string = 'default'): Types.RealtimePromise {
     const client = React.useContext(getContext(id)) as Types.RealtimePromise;

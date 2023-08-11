@@ -112,10 +112,7 @@ describe('usePresence', () => {
                 id="otherClient"
                 client={otherClient as unknown as Types.RealtimePromise}
             >
-                <UsePresenceComponentMultipleClients
-                    client1={ablyClient}
-                    client2={otherClient}
-                ></UsePresenceComponentMultipleClients>
+                <UsePresenceComponentMultipleClients />
             </AblyProvider>
         );
 
@@ -208,12 +205,12 @@ const UsePresenceComponent = () => {
     );
 };
 
-const UsePresenceComponentMultipleClients = ({ client1, client2 }) => {
+const UsePresenceComponentMultipleClients = () => {
     const { presenceData: val1, updateStatus: update1 } = usePresence(
         { channelName: testChannelName },
         'foo'
     );
-    const { presenceData: val2, updateStatus: update2 } = usePresence(
+    const { updateStatus: update2 } = usePresence(
         { channelName: testChannelName, id: 'otherClient' },
         'bar'
     );

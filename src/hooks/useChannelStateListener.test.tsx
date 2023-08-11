@@ -2,7 +2,7 @@ import React from 'react';
 import { it, beforeEach, describe, expect } from 'vitest';
 import { useChannelStateListener } from './useChannelStateListener';
 import { useState } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';
 import { Types } from 'ably';
 import { act } from 'react-dom/test-utils';

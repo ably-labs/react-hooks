@@ -1,9 +1,7 @@
 import { Types } from 'ably';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { ChannelParameters } from '../AblyReactHooks.js';
 import { useAbly } from './useAbly';
-import { useConnectionStateListener } from './useConnectionStateListener';
-import { useChannelStateListener } from './useChannelStateListener';
 import { useStateErrors } from './useStateErrors';
 
 export type AblyMessageCallback = (message: Types.Message) => void;
@@ -41,7 +39,7 @@ export function useChannel(
 
     const channel = useMemo(
         () => ably.channels.get(channelName, channelOptionsRef.current),
-        [channelName]
+        [ably, channelName]
     );
 
     const { connectionError, channelError } =
@@ -71,7 +69,7 @@ export function useChannel(
             channelOptionsRef.current = channelOptions;
             channel.setOptions(channelOptions);
         }
-    }, [channelOptions]);
+    }, [channel, channelOptions]);
 
     const useEffectHook = () => {
         onMount();
@@ -80,6 +78,7 @@ export function useChannel(
         };
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(useEffectHook, [channelHookOptions.channelName]);
 
     return { channel, ably, connectionError, channelError };

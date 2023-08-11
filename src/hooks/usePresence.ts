@@ -81,6 +81,7 @@ export function usePresence<T = any>(
         };
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(useEffectHook, []);
 
     const updateStatus = useCallback(
@@ -93,7 +94,7 @@ export function usePresence<T = any>(
                 );
             }
         },
-        [channel]
+        [subscribeOnly, channel]
     );
 
     return { presenceData, updateStatus, connectionError, channelError };
