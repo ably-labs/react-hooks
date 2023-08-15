@@ -2,11 +2,14 @@ import { Types } from 'ably';
 import { useCallback, useEffect, useState } from 'react';
 import { ChannelParameters } from '../AblyReactHooks.js';
 import { useAbly } from './useAbly.js';
+import { useStateErrors } from './useStateErrors';
 
-export type PresenceDataAndPresenceUpdateFunction<T> = [
-    presenceData: PresenceMessage<T>[],
-    updateStatus: (messageOrPresenceObject: T) => void,
-];
+export interface PresenceResult<T> {
+    presenceData: PresenceMessage<T>[];
+    updateStatus: (messageOrPresenceObject: T) => void;
+    connectionError: Types.ErrorInfo | null;
+    channelError: Types.ErrorInfo | null;
+}
 
 export type OnPresenceMessageReceived<T> = (
     presenceData: PresenceMessage<T>
@@ -19,35 +22,26 @@ export function usePresence<T = any>(
     channelNameOrNameAndOptions: ChannelParameters,
     messageOrPresenceObject?: T,
     onPresenceUpdated?: OnPresenceMessageReceived<T>
-): PresenceDataAndPresenceUpdateFunction<T> {
-    const ably = useAbly(
+): PresenceResult<T> {
+    const params =
         typeof channelNameOrNameAndOptions === 'object'
-            ? channelNameOrNameAndOptions.id
-            : undefined
-    );
-
-    const channelName =
-        typeof channelNameOrNameAndOptions === 'string'
             ? channelNameOrNameAndOptions
-            : channelNameOrNameAndOptions.channelName;
+            : { channelName: channelNameOrNameAndOptions };
 
-    const channel =
-        typeof channelNameOrNameAndOptions === 'string'
-            ? ably.channels.get(channelName)
-            : ably.channels.get(
-                  channelName,
-                  channelNameOrNameAndOptions.options
-              );
+    const ably = useAbly(params.id);
 
     const subscribeOnly =
         typeof channelNameOrNameAndOptions === 'string'
             ? false
-            : channelNameOrNameAndOptions.subscribeOnly;
+            : params.subscribeOnly;
 
-    const [presenceData, updatePresenceData] = useState([]) as [
-        Array<PresenceMessage<T>>,
-        UseStatePresenceUpdate,
-    ];
+    const channel = ably.channels.get(params.channelName, params.options);
+
+    const { connectionError, channelError } = useStateErrors(params);
+
+    const [presenceData, updatePresenceData] = useState<
+        Array<PresenceMessage<T>>
+    >([]);
 
     const updatePresence = async (message?: Types.PresenceMessage) => {
         const snapshot = await channel.presence.get();
@@ -102,7 +96,7 @@ export function usePresence<T = any>(
         [channel]
     );
 
-    return [presenceData, updateStatus];
+    return { presenceData, updateStatus, connectionError, channelError };
 }
 
 interface PresenceMessage<T = any> {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { it, beforeEach, describe, expect } from 'vitest';
+import { it, beforeEach, describe, expect, vi } from 'vitest';
 import { usePresence } from './usePresence';
 import { render, screen, act } from '@testing-library/react';
 import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';
@@ -129,12 +129,64 @@ describe('usePresence', () => {
         expect(values).toContain(`"data":"baz1"`);
         expect(values).toContain(`"data":"baz2"`);
     });
+
+    it('handles channel errors', async () => {
+        const onChannelError = vi.fn();
+        const reason = { message: 'foo' };
+
+        renderInCtxProvider(
+            ablyClient,
+            <UsePresenceStateErrorsComponent
+                onChannelError={onChannelError}
+            ></UsePresenceStateErrorsComponent>
+        );
+
+        const channelErrorElem = screen.getByRole('channelError');
+        expect(onChannelError).toHaveBeenCalledTimes(0);
+        expect(channelErrorElem.innerHTML).toEqual('');
+
+        await act(async () => {
+            ablyClient.channels.get('blah').emit('failed', {
+                reason,
+            });
+        });
+
+        expect(channelErrorElem.innerHTML).toEqual(reason.message);
+        expect(onChannelError).toHaveBeenCalledTimes(1);
+        expect(onChannelError).toHaveBeenCalledWith(reason);
+    });
+
+    it('handles connection errors', async () => {
+        const onConnectionError = vi.fn();
+        const reason = { message: 'foo' };
+
+        renderInCtxProvider(
+            ablyClient,
+            <UsePresenceStateErrorsComponent
+                onConnectionError={onConnectionError}
+            ></UsePresenceStateErrorsComponent>
+        );
+
+        const connectionErrorElem = screen.getByRole('connectionError');
+        expect(onConnectionError).toHaveBeenCalledTimes(0);
+        expect(connectionErrorElem.innerHTML).toEqual('');
+
+        await act(async () => {
+            ablyClient.connection.emit('failed', {
+                reason,
+            });
+        });
+
+        expect(connectionErrorElem.innerHTML).toEqual(reason.message);
+        expect(onConnectionError).toHaveBeenCalledTimes(1);
+        expect(onConnectionError).toHaveBeenCalledWith(reason);
+    });
 });
 
 const UsePresenceComponent = () => {
-    const [val, update] = usePresence(testChannelName, 'bar');
+    const { presenceData, updateStatus } = usePresence(testChannelName, 'bar');
 
-    const presentUsers = val.map((presence, index) => {
+    const presentUsers = presenceData.map((presence, index) => {
         return (
             <li key={index}>
                 {presence.clientId} - {JSON.stringify(presence)}
@@ -146,7 +198,7 @@ const UsePresenceComponent = () => {
         <>
             <button
                 onClick={() => {
-                    update('baz');
+                    updateStatus('baz');
                 }}
             >
                 Update
@@ -157,11 +209,11 @@ const UsePresenceComponent = () => {
 };
 
 const UsePresenceComponentMultipleClients = ({ client1, client2 }) => {
-    const [val1, update1] = usePresence(
+    const { presenceData: val1, updateStatus: update1 } = usePresence(
         { channelName: testChannelName },
         'foo'
     );
-    const [val2, update2] = usePresence(
+    const { presenceData: val2, updateStatus: update2 } = usePresence(
         { channelName: testChannelName, id: 'otherClient' },
         'bar'
     );
@@ -189,16 +241,39 @@ const UsePresenceComponentMultipleClients = ({ client1, client2 }) => {
     );
 };
 
+interface UsePresenceStateErrorsComponentProps {
+    onConnectionError?: (err: Types.ErrorInfo) => unknown;
+    onChannelError?: (err: Types.ErrorInfo) => unknown;
+}
+
+const UsePresenceStateErrorsComponent = ({
+    onConnectionError,
+    onChannelError,
+}: UsePresenceStateErrorsComponentProps) => {
+    const { connectionError, channelError } = usePresence({
+        channelName: 'blah',
+        onConnectionError,
+        onChannelError,
+    });
+
+    return (
+        <>
+            <p role="connectionError">{connectionError?.message}</p>
+            <p role="channelError">{channelError?.message}</p>
+        </>
+    );
+};
+
 interface MyPresenceType {
     foo: string;
 }
 
 const TypedUsePresenceComponent = () => {
-    const [val] = usePresence<MyPresenceType>('testChannelName', {
+    const { presenceData } = usePresence<MyPresenceType>('testChannelName', {
         foo: 'bar',
     });
 
-    return <div role="presence">{JSON.stringify(val)}</div>;
+    return <div role="presence">{JSON.stringify(presenceData)}</div>;
 };
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

@@ -12,7 +12,7 @@ export function useChannelStateListener(
 );
 
 export function useChannelStateListener(
-    options: ChannelNameAndId,
+    options: ChannelNameAndId | string,
     state?: Types.ChannelState | Types.ChannelState[],
     listener?: ChannelStateListener
 );
@@ -28,7 +28,7 @@ export function useChannelStateListener(
     const channelName =
         typeof channelNameOrNameAndId === 'string'
             ? channelNameOrNameAndId
-            : channelNameOrNameAndId.id;
+            : channelNameOrNameAndId.channelName;
     const id = (channelNameOrNameAndId as ChannelNameAndId)?.id;
 
     const ably = useAbly(id);
