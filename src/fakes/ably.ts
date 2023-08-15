@@ -271,7 +271,7 @@ export class Channel {
             };
 
             for (const [
-                messageName,
+                ,
                 subscriptions,
             ] of this.subscriptionsPerClient.entries()) {
                 let subs = [...subscriptions.values()].flat();
@@ -284,7 +284,7 @@ export class Channel {
                 }
             }
 
-            this.publishedMessages.push({ messageEnvelope, arguments });
+            this.publishedMessages.push({ messageEnvelope });
         }
     }
 
@@ -341,7 +341,7 @@ export class ChannelPresence {
     }
 
     public get() {
-        return [...this.presenceObjects.entries()].map(([_, data]) => {
+        return [...this.presenceObjects.entries()].map(([, data]) => {
             return data;
         });
     }
@@ -388,10 +388,7 @@ export class ChannelPresence {
     }
 
     private triggerSubs(subType: string, data: any) {
-        for (const [
-            clientId,
-            subscriptions,
-        ] of this.subscriptionsPerClient.entries()) {
+        for (const [, subscriptions] of this.subscriptionsPerClient.entries()) {
             const subs = subscriptions.get(subType);
             for (const callback of subs) {
                 callback(data);

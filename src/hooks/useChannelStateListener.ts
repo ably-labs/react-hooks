@@ -1,6 +1,5 @@
 import { Types } from 'ably';
 import { ChannelNameAndId } from '../AblyReactHooks';
-import { useEffect, useState } from 'react';
 import { useAbly } from './useAbly';
 import { useEventListener } from './useEventListener';
 
