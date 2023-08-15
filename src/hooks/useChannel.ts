@@ -4,7 +4,7 @@ import { ChannelParameters } from '../AblyReactHooks.js';
 import { useAbly } from './useAbly';
 import { useStateErrors } from './useStateErrors';
 
-export type AblyMessageCallback = (message: Types.Message) => void;
+export type AblyMessageCallback = Types.messageCallback<Types.Message>;
 
 export interface ChannelResult {
     channel: Types.RealtimeChannelPromise;
@@ -12,6 +12,8 @@ export interface ChannelResult {
     connectionError: Types.ErrorInfo | null;
     channelError: Types.ErrorInfo | null;
 }
+
+type SubscribeArgs = [string, AblyMessageCallback] | [AblyMessageCallback];
 
 export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
@@ -25,7 +27,8 @@ export function useChannel(
 
 export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
-    ...channelSubscriptionArguments: any[]
+    eventOrCallback: string | AblyMessageCallback,
+    callback?: AblyMessageCallback
 ): ChannelResult {
     const channelHookOptions =
         typeof channelNameOrNameAndOptions === 'object'
@@ -35,7 +38,14 @@ export function useChannel(
     const ably = useAbly(channelHookOptions.id);
 
     const { channelName, options: channelOptions } = channelHookOptions;
+
+    const channelEvent =
+        typeof eventOrCallback === 'string' ? eventOrCallback : null;
+    const ablyMessageCallback =
+        typeof eventOrCallback === 'string' ? callback : eventOrCallback;
+
     const channelOptionsRef = useRef(channelOptions);
+    const ablyMessageCallbackRef = useRef(ablyMessageCallback);
 
     const channel = useMemo(
         () => ably.channels.get(channelName, channelOptionsRef.current),
@@ -45,41 +55,54 @@ export function useChannel(
     const { connectionError, channelError } =
         useStateErrors(channelHookOptions);
 
-    const onMount = async () => {
-        await channel.subscribe.apply(channel, channelSubscriptionArguments);
-    };
-
-    const onUnmount = async () => {
-        await channel.unsubscribe.apply(channel, channelSubscriptionArguments);
-
-        setTimeout(async () => {
-            // React is very mount/unmount happy, so if we just detatch the channel
-            // it's quite likely it will be reattached again by a subsequent onMount calls.
-            // To solve this, we set a timer, and if all the listeners have been removed, we know that the component
-            // has been removed for good and we can detatch the channel.
-
-            if (channel.listeners.length === 0) {
-                await channel.detach();
-            }
-        }, 2500);
-    };
-
     useEffect(() => {
         if (channelOptionsRef.current !== channelOptions) {
-            channelOptionsRef.current = channelOptions;
             channel.setOptions(channelOptions);
         }
+        channelOptionsRef.current = channelOptions;
     }, [channel, channelOptions]);
 
-    const useEffectHook = () => {
-        onMount();
-        return () => {
-            onUnmount();
-        };
-    };
+    useEffect(() => {
+        ablyMessageCallbackRef.current = ablyMessageCallback;
+    }, [ablyMessageCallback]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(useEffectHook, [channelHookOptions.channelName]);
+    useEffect(() => {
+        const listener: AblyMessageCallback = (message) => {
+            ablyMessageCallbackRef.current(message);
+        };
+
+        const subscribeArgs: SubscribeArgs =
+            channelEvent === null ? [listener] : [channelEvent, listener];
+
+        handleChannelMount(channel, ...subscribeArgs);
+        return () => {
+            handleChannelUnmount(channel, ...subscribeArgs);
+        };
+    }, [channelEvent, channel]);
 
     return { channel, ably, connectionError, channelError };
+}
+
+async function handleChannelMount(
+    channel: Types.RealtimeChannelPromise,
+    ...subscribeArgs: SubscribeArgs
+) {
+    await (channel.subscribe as any)(...subscribeArgs);
+}
+
+async function handleChannelUnmount(
+    channel: Types.RealtimeChannelPromise,
+    ...subscribeArgs: SubscribeArgs
+) {
+    await (channel.unsubscribe as any)(...subscribeArgs);
+
+    setTimeout(async () => {
+        // React is very mount/unmount happy, so if we just detatch the channel
+        // it's quite likely it will be reattached again by a subsequent handleChannelMount calls.
+        // To solve this, we set a timer, and if all the listeners have been removed, we know that the component
+        // has been removed for good and we can detatch the channel.
+        if (channel.listeners.length === 0) {
+            await channel.detach();
+        }
+    }, 2500);
 }

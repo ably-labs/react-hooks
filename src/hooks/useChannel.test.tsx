@@ -143,6 +143,10 @@ describe('useChannel', () => {
         expect(onConnectionError).toHaveBeenCalledTimes(1);
         expect(onConnectionError).toHaveBeenCalledWith(reason);
     });
+
+    it('should use latest version of message callback', async () => {});
+
+    it('should re-subscribe if event name has changed', async () => {});
 });
 
 const UseChannelComponentMultipleClients = () => {
