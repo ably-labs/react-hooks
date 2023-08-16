@@ -56,7 +56,7 @@ export function useChannel(
         useStateErrors(channelHookOptions);
 
     useEffect(() => {
-        if (channelOptionsRef.current !== channelOptions) {
+        if (channelOptionsRef.current !== channelOptions && channelOptions) {
             channel.setOptions(channelOptions);
         }
         channelOptionsRef.current = channelOptions;
@@ -68,7 +68,8 @@ export function useChannel(
 
     useEffect(() => {
         const listener: AblyMessageCallback = (message) => {
-            ablyMessageCallbackRef.current(message);
+            ablyMessageCallbackRef.current &&
+                ablyMessageCallbackRef.current(message);
         };
 
         const subscribeArgs: SubscribeArgs =
