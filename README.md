@@ -42,9 +42,10 @@ This works out of the box using `create-react-app` - and you can use the package
 The latest version of this package tracks the latest version of react.
 
 | React Version | @ably-labs/react-hooks Version |
-|----------|--------|
-| >=17.0.2 |  1.1.8 |
-| >=18.1.0 |  2.0.x (current) |
+|----------|--------------------------------|
+| >=17.0.2 | 1.1.8                          |
+| >=18.1.0 | 2.x.x                          |
+| >=16.8.0 | 3.x.x (current)                |
 
 ### Ably channels and API keys
 
