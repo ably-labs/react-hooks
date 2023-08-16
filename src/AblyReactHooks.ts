@@ -4,7 +4,6 @@ export type ChannelNameAndOptions = {
     channelName: string;
     options?: Types.ChannelOptions;
     id?: string;
-    realtime?: Types.RealtimePromise;
     subscribeOnly?: boolean;
     onConnectionError?: (error: Types.ErrorInfo) => unknown;
     onChannelError?: (error: Types.ErrorInfo) => unknown;
