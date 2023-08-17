@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { it, beforeEach, describe, expect, vi } from 'vitest';
 import { useChannel } from './useChannel';
-import { useState } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';
 import { Types } from 'ably';
 import { act } from 'react-dom/test-utils';
@@ -143,6 +142,66 @@ describe('useChannel', () => {
         expect(onConnectionError).toHaveBeenCalledTimes(1);
         expect(onConnectionError).toHaveBeenCalledWith(reason);
     });
+
+    it('should use the latest version of the message callback', async () => {
+        let callbackCount = 0;
+
+        const TestComponent = () => {
+            const [count, setCount] = React.useState(0);
+
+            useChannel('blah', () => {
+                callbackCount++;
+                setCount(count + 1);
+            });
+
+            return <div role="counter">{count}</div>;
+        };
+
+        renderInCtxProvider(ablyClient, <TestComponent />);
+
+        await act(async () => {
+            ablyClient.channels.get('blah').publish({ text: 'test message 1' });
+        });
+
+        await act(async () => {
+            ablyClient.channels.get('blah').publish({ text: 'test message 2' });
+        });
+
+        expect(screen.getByRole('counter').innerHTML).toEqual('2');
+        expect(callbackCount).toBe(2);
+    });
+
+    it('should re-subscribe if event name has changed', async () => {
+        const channel = ablyClient.channels.get('blah');
+        channel.subscribe = vi.fn();
+        channel.unsubscribe = vi.fn();
+
+        const newEventName = 'event2';
+
+        renderInCtxProvider(
+            ablyClient,
+            <ChangingEventComponent newEventName={newEventName} />
+        );
+
+        await waitFor(() =>
+            expect(channel.subscribe).toHaveBeenCalledWith(
+                'event1',
+                expect.any(Function)
+            )
+        );
+
+        await waitFor(() =>
+            expect(channel.unsubscribe).toHaveBeenCalledWith(
+                'event1',
+                expect.any(Function)
+            )
+        );
+
+        expect(channel.subscribe).toHaveBeenCalledWith(
+            newEventName,
+            expect.any(Function)
+        );
+    });
 });
 
 const UseChannelComponentMultipleClients = () => {
@@ -194,4 +253,20 @@ const UseChannelStateErrorsComponent = ({
             <p role="channelError">{channelError?.message}</p>
         </>
     );
+};
+
+const ChangingEventComponent = ({ newEventName }: { newEventName: string }) => {
+    const [eventName, setEventName] = useState('event1');
+
+    useChannel('blah', eventName, () => {});
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setEventName(newEventName);
+        }, 50);
+
+        return () => clearTimeout(timeoutId);
+    }, [newEventName]);
+
+    return null;
 };
