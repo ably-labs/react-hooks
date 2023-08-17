@@ -83,8 +83,7 @@ export const AblyProvider = ({
                 realtime.close();
             };
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [realtime, options]);
 
     return <context.Provider value={realtime}>{children}</context.Provider>;
 };
