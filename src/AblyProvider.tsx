@@ -1,6 +1,6 @@
 import Ably from 'ably';
 import { Types } from 'ably';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 const version = '2.1.1';
 
@@ -66,8 +66,10 @@ export const AblyProvider = ({
         throw new Error('Provide client or options, not both');
     }
 
-    const realtime: Realtime =
-        client || new Realtime(options as Ably.Types.ClientOptions);
+    const realtime = useMemo(
+        () => client || new Realtime(options as Ably.Types.ClientOptions),
+        [client, options]
+    );
 
     let context = getContext(id);
     if (!context) {
@@ -81,12 +83,7 @@ export const AblyProvider = ({
                 realtime.close();
             };
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [realtime, options]);
 
-    return (
-        <context.Provider value={client as Ably.Types.RealtimePromise}>
-            {children}
-        </context.Provider>
-    );
+    return <context.Provider value={realtime}>{children}</context.Provider>;
 };
