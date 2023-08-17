@@ -151,7 +151,7 @@ describe('useChannel', () => {
 
             useChannel('blah', () => {
                 callbackCount++;
-                setCount((prev) => prev + 1);
+                setCount(count + 1);
             });
 
             return <div role="counter">{count}</div>;
@@ -161,6 +161,9 @@ describe('useChannel', () => {
 
         await act(async () => {
             ablyClient.channels.get('blah').publish({ text: 'test message 1' });
+        });
+
+        await act(async () => {
             ablyClient.channels.get('blah').publish({ text: 'test message 2' });
         });
 
