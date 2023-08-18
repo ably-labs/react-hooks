@@ -1,13 +1,12 @@
 import { Types } from 'ably';
 import React, { useState } from 'react';
 import {
-    AblyProvider,
     useChannel,
     usePresence,
     useConnectionStateListener,
     useChannelStateListener,
     useAbly,
-} from '../../src/index';
+} from '../../src/index.js';
 import './App.css';
 
 function App() {
@@ -24,9 +23,7 @@ function App() {
         }
     );
 
-    const [connectionState, setConnectionState] = useState(
-        ably.connection.state
-    );
+    const [, setConnectionState] = useState(ably.connection.state);
 
     useConnectionStateListener((stateChange) => {
         setConnectionState(stateChange.current);
@@ -82,7 +79,7 @@ function App() {
             <div style={{ position: 'fixed', width: '250px' }}>
                 <ConnectionState />
             </div>
-            <div style={{marginLeft: '250px'}}>
+            <div style={{ marginLeft: '250px' }}>
                 <h2>Channel detach</h2>
                 <button onClick={() => channel.detach()}>Detach</button>
                 <button onClick={() => ably.close()}>Close</button>

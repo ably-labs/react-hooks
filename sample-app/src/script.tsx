@@ -2,8 +2,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import * as Ably from 'ably';
 
-import App from './App';
-import { AblyProvider } from '../../src/index';
+import App from './App.js';
+import { AblyProvider } from '../../src/index.js';
 
 const container = document.getElementById('root')!;
 
