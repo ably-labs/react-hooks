@@ -1,8 +1,8 @@
 import { Types } from 'ably';
 import { useState } from 'react';
-import { useConnectionStateListener } from './useConnectionStateListener';
-import { useChannelStateListener } from './useChannelStateListener';
-import { ChannelNameAndOptions } from '../AblyReactHooks';
+import { useConnectionStateListener } from './useConnectionStateListener.js';
+import { useChannelStateListener } from './useChannelStateListener.js';
+import { ChannelNameAndOptions } from '../AblyReactHooks.js';
 
 export function useStateErrors(params: ChannelNameAndOptions) {
     const [connectionError, setConnectionError] =

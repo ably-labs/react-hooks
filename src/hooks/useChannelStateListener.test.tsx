@@ -1,12 +1,12 @@
 import React from 'react';
 import { it, beforeEach, describe, expect } from 'vitest';
-import { useChannelStateListener } from './useChannelStateListener';
+import { useChannelStateListener } from './useChannelStateListener.js';
 import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
-import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';
+import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably.js';
 import { Types } from 'ably';
 import { act } from 'react-dom/test-utils';
-import { AblyProvider } from '../AblyProvider';
+import { AblyProvider } from '../AblyProvider.js';
 
 function renderInCtxProvider(
     client: FakeAblySdk,

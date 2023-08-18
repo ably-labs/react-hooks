@@ -1,8 +1,8 @@
 import { Types } from 'ably';
 import { useEffect, useMemo, useRef } from 'react';
 import { ChannelParameters } from '../AblyReactHooks.js';
-import { useAbly } from './useAbly';
-import { useStateErrors } from './useStateErrors';
+import { useAbly } from './useAbly.js';
+import { useStateErrors } from './useStateErrors.js';
 
 export type AblyMessageCallback = Types.messageCallback<Types.Message>;
 

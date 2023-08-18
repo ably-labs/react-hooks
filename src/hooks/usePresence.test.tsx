@@ -1,9 +1,9 @@
 import React from 'react';
 import { it, beforeEach, describe, expect, vi } from 'vitest';
-import { usePresence } from './usePresence';
+import { usePresence } from './usePresence.js';
 import { render, screen, act } from '@testing-library/react';
-import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably';
-import { AblyProvider } from '../AblyProvider';
+import { FakeAblySdk, FakeAblyChannels } from '../fakes/ably.js';
+import { AblyProvider } from '../AblyProvider.js';
 import { Types } from 'ably';
 
 function renderInCtxProvider(
