@@ -14,15 +14,30 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "plugins": ["@typescript-eslint", "react", "react-hooks"],
+    "plugins": ["@typescript-eslint", "react", "react-hooks", "import"],
     "rules": {
         // we should remove these at some point
-        "@typescript-eslint/no-explicit-any": 0,
-        "prefer-spread": 0
+        "@typescript-eslint/no-explicit-any": 0
     },
     "settings": {
         "react": {
             "version": "detect"
         }
-    }
+    },
+    "overrides": [
+        {
+            "files": ["**/*.{ts,tsx}"],
+            "rules": {
+                // see:
+                // https://github.com/microsoft/TypeScript/issues/16577#issuecomment-703190339
+                "import/extensions": [
+                    "error",
+                    "always",
+                    {
+                        "ignorePackages": true
+                    }
+                ]
+            }
+        }
+    ]
 }

@@ -1,6 +1,6 @@
 import { Types } from 'ably';
-import { useAbly } from './useAbly';
-import { useEventListener } from './useEventListener';
+import { useAbly } from './useAbly.js';
+import { useEventListener } from './useEventListener.js';
 
 type ConnectionStateListener = (
     stateChange: Types.ConnectionStateChange

@@ -2,7 +2,7 @@ import { Types } from 'ably';
 import { useCallback, useEffect, useState } from 'react';
 import { ChannelParameters } from '../AblyReactHooks.js';
 import { useAbly } from './useAbly.js';
-import { useStateErrors } from './useStateErrors';
+import { useStateErrors } from './useStateErrors.js';
 
 export interface PresenceResult<T> {
     presenceData: PresenceMessage<T>[];

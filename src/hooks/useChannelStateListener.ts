@@ -1,7 +1,7 @@
 import { Types } from 'ably';
-import { ChannelNameAndId } from '../AblyReactHooks';
-import { useAbly } from './useAbly';
-import { useEventListener } from './useEventListener';
+import { ChannelNameAndId } from '../AblyReactHooks.js';
+import { useAbly } from './useAbly.js';
+import { useEventListener } from './useEventListener.js';
 
 type ChannelStateListener = (stateChange: Types.ChannelStateChange) => any;
 

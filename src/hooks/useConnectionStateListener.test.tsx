@@ -2,11 +2,11 @@ import React from 'react';
 import { it, beforeEach, describe, expect } from 'vitest';
 import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
-import { FakeAblySdk } from '../fakes/ably';
+import { FakeAblySdk } from '../fakes/ably.js';
 import { Types } from 'ably';
 import { act } from 'react-dom/test-utils';
-import { AblyProvider } from '../AblyProvider';
-import { useConnectionStateListener } from './useConnectionStateListener';
+import { AblyProvider } from '../AblyProvider.js';
+import { useConnectionStateListener } from './useConnectionStateListener.js';
 
 function renderInCtxProvider(
     client: FakeAblySdk,
