@@ -38,7 +38,7 @@ function App() {
         undefined | Types.ErrorInfo
     >();
 
-    useChannelStateListener('your-channel-name', 'detached', (stateChange) => {
+    useChannelStateListener('your-channel-name', (stateChange) => {
         setAblyErr(JSON.stringify(stateChange.reason));
         setChannelState(stateChange.current);
         setPreviousChannelState(stateChange.previous);
