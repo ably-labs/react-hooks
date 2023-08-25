@@ -11,12 +11,16 @@ import './App.css';
 
 function App() {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
-    const { channel, ably } = useChannel('your-channel-name', (message) => {
-        updateMessages((prev) => [...prev, message]);
-    });
+    const [skip, setSkip] = useState(false);
+    const { channel, ably } = useChannel(
+        { channelName: 'your-channel-name', skip },
+        (message) => {
+            updateMessages((prev) => [...prev, message]);
+        }
+    );
 
     const { presenceData, updateStatus } = usePresence(
-        'your-channel-name',
+        { channelName: 'your-channel-name', skip },
         { foo: 'bar' },
         (update) => {
             console.log(update);
@@ -80,6 +84,10 @@ function App() {
                 <ConnectionState />
             </div>
             <div style={{ marginLeft: '250px' }}>
+                <h2>Skip</h2>
+                <button onClick={() => setSkip(!skip)}>
+                    Toggle skip param
+                </button>
                 <h2>Channel detach</h2>
                 <button onClick={() => channel.detach()}>Detach</button>
                 <button onClick={() => ably.close()}>Close</button>

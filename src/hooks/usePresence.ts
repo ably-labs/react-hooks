@@ -36,6 +36,7 @@ export function usePresence<T = any>(
             : params.subscribeOnly;
 
     const channel = ably.channels.get(params.channelName, params.options);
+    const skip = params.skip;
 
     const { connectionError, channelError } = useStateErrors(params);
 
@@ -75,14 +76,14 @@ export function usePresence<T = any>(
     };
 
     const useEffectHook = () => {
-        onMount();
+        !skip && onMount();
         return () => {
             onUnmount();
         };
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(useEffectHook, []);
+    useEffect(useEffectHook, [skip]);
 
     const updateStatus = useCallback(
         (messageOrPresenceObject: T) => {
