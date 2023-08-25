@@ -46,7 +46,7 @@ describe('useChannel', () => {
         );
 
         await act(async () => {
-            otherClient.channels.get('blah').publish({ text: 'message text' });
+            await otherClient.channels.get('blah').publish({ text: 'message text' });
         });
 
         const messageUl = screen.getAllByRole('messages')[0];
@@ -61,8 +61,8 @@ describe('useChannel', () => {
         );
 
         await act(async () => {
-            otherClient.channels.get('blah').publish({ text: 'message text1' });
-            otherClient.channels.get('blah').publish({ text: 'message text2' });
+            await otherClient.channels.get('blah').publish({ text: 'message text1' });
+            await otherClient.channels.get('blah').publish({ text: 'message text2' });
         });
 
         const messageUl = screen.getAllByRole('messages')[0];
@@ -82,8 +82,8 @@ describe('useChannel', () => {
         );
 
         await act(async () => {
-            ablyClient.channels.get('blah').publish({ text: 'message text1' });
-            otherClient.channels.get('bleh').publish({ text: 'message text2' });
+            await ablyClient.channels.get('blah').publish({ text: 'message text1' });
+            await otherClient.channels.get('bleh').publish({ text: 'message text2' });
         });
 
         const messageUl = screen.getAllByRole('messages')[0];
