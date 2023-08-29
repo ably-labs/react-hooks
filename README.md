@@ -110,6 +110,8 @@ const { channel } = useChannel("your-channel-name", (message) => {
 
 Every time a message is sent to `your-channel-name` it'll be logged to the console. You can do whatever you need to with those messages.
 
+Our react hooks are designed to run on the client-side, so if you are using server-side rendering, make sure that your components which use Ably react hooks are only rendered on the client side.
+
 ---
 
 ### useChannel
