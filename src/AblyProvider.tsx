@@ -52,6 +52,8 @@ export function getContext(ctxId = 'default'): AblyContextType {
     return ctxMap[ctxId];
 }
 
+let hasSentAgent = false;
+
 export const AblyProvider = ({
     client,
     children,
@@ -75,6 +77,16 @@ export const AblyProvider = ({
     if (!context) {
         context = ctxMap[id] = React.createContext(realtime);
     }
+
+    React.useEffect(() => {
+        if (!hasSentAgent) {
+            realtime
+                .request('GET', '/time', { agent: 'react-hooks-time-ping' })
+                .then(() => {
+                    hasSentAgent = true;
+                });
+        }
+    });
 
     // If options have been provided, the client cannot be accessed after the provider has unmounted, so close it
     React.useEffect(() => {
