@@ -37,7 +37,7 @@ export function useChannel(
 
     const ably = useAbly(channelHookOptions.id);
 
-    const { channelName, options: channelOptions } = channelHookOptions;
+    const { channelName, options: channelOptions, skip } = channelHookOptions;
 
     const channelEvent =
         typeof eventOrCallback === 'string' ? eventOrCallback : null;
@@ -75,11 +75,14 @@ export function useChannel(
         const subscribeArgs: SubscribeArgs =
             channelEvent === null ? [listener] : [channelEvent, listener];
 
-        handleChannelMount(channel, ...subscribeArgs);
+        if (!skip) {
+            handleChannelMount(channel, ...subscribeArgs);
+        }
+
         return () => {
-            handleChannelUnmount(channel, ...subscribeArgs);
+            !skip && handleChannelUnmount(channel, ...subscribeArgs);
         };
-    }, [channelEvent, channel]);
+    }, [channelEvent, channel, skip]);
 
     return { channel, ably, connectionError, channelError };
 }

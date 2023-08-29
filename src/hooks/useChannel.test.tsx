@@ -46,7 +46,9 @@ describe('useChannel', () => {
         );
 
         await act(async () => {
-            otherClient.channels.get('blah').publish({ text: 'message text' });
+            await otherClient.channels
+                .get('blah')
+                .publish({ text: 'message text' });
         });
 
         const messageUl = screen.getAllByRole('messages')[0];
@@ -61,8 +63,12 @@ describe('useChannel', () => {
         );
 
         await act(async () => {
-            otherClient.channels.get('blah').publish({ text: 'message text1' });
-            otherClient.channels.get('blah').publish({ text: 'message text2' });
+            await otherClient.channels
+                .get('blah')
+                .publish({ text: 'message text1' });
+            await otherClient.channels
+                .get('blah')
+                .publish({ text: 'message text2' });
         });
 
         const messageUl = screen.getAllByRole('messages')[0];
@@ -82,8 +88,12 @@ describe('useChannel', () => {
         );
 
         await act(async () => {
-            ablyClient.channels.get('blah').publish({ text: 'message text1' });
-            otherClient.channels.get('bleh').publish({ text: 'message text2' });
+            await ablyClient.channels
+                .get('blah')
+                .publish({ text: 'message text1' });
+            await otherClient.channels
+                .get('bleh')
+                .publish({ text: 'message text2' });
         });
 
         const messageUl = screen.getAllByRole('messages')[0];
@@ -141,6 +151,22 @@ describe('useChannel', () => {
         expect(connectionErrorElem.innerHTML).toEqual(reason.message);
         expect(onConnectionError).toHaveBeenCalledTimes(1);
         expect(onConnectionError).toHaveBeenCalledWith(reason);
+    });
+
+    it('skip param', async () => {
+        renderInCtxProvider(
+            ablyClient,
+            <UseChannelComponent skip={true}></UseChannelComponent>
+        );
+
+        await act(async () => {
+            await otherClient.channels
+                .get('blah')
+                .publish({ text: 'message text' });
+        });
+
+        const messageUl = screen.getAllByRole('messages')[0];
+        expect(messageUl.childElementCount).toBe(0);
     });
 
     it('should use the latest version of the message callback', async () => {
@@ -220,9 +246,9 @@ const UseChannelComponentMultipleClients = () => {
     return <ul role="messages">{messagePreviews}</ul>;
 };
 
-const UseChannelComponent = () => {
+const UseChannelComponent = ({ skip }: { skip?: boolean }) => {
     const [messages, updateMessages] = useState<Types.Message[]>([]);
-    useChannel('blah', (message) => {
+    useChannel({ channelName: 'blah', skip }, (message) => {
         updateMessages((prev) => [...prev, message]);
     });
 

@@ -384,7 +384,7 @@ export class ChannelPresence {
 
     public unsubscribe(clientId: string, key: string) {
         const subsForClient = this.subscriptionsPerClient.get(clientId);
-        subsForClient.set(key, []);
+        subsForClient?.set(key, []);
     }
 
     private triggerSubs(subType: string, data: any) {

@@ -105,6 +105,20 @@ describe('usePresence', () => {
         expect(values).toContain(`"data":{"foo":"bar"}`);
     });
 
+    it('skip param', async () => {
+        renderInCtxProvider(
+            ablyClient,
+            <UsePresenceComponent skip={true}></UsePresenceComponent>
+        );
+
+        await act(async () => {
+            await wait(2);
+        });
+
+        const values = screen.getByRole('presence').innerHTML;
+        expect(values).to.not.contain(`"bar"`);
+    });
+
     it('usePresence works with multiple clients', async () => {
         renderInCtxProvider(
             ablyClient,
@@ -180,8 +194,11 @@ describe('usePresence', () => {
     });
 });
 
-const UsePresenceComponent = () => {
-    const { presenceData, updateStatus } = usePresence(testChannelName, 'bar');
+const UsePresenceComponent = ({ skip }: { skip?: boolean }) => {
+    const { presenceData, updateStatus } = usePresence(
+        { channelName: testChannelName, skip },
+        'bar'
+    );
 
     const presentUsers = presenceData.map((presence, index) => {
         return (

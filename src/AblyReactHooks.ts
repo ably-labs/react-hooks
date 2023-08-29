@@ -5,6 +5,8 @@ export type ChannelNameAndOptions = {
     options?: Types.ChannelOptions;
     id?: string;
     subscribeOnly?: boolean;
+    skip?: boolean;
+
     onConnectionError?: (error: Types.ErrorInfo) => unknown;
     onChannelError?: (error: Types.ErrorInfo) => unknown;
 };
