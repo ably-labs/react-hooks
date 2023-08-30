@@ -17,17 +17,17 @@ type SubscribeArgs = [string, AblyMessageCallback] | [AblyMessageCallback];
 
 export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
-    callbackOnMessage: AblyMessageCallback
+    callbackOnMessage?: AblyMessageCallback
 ): ChannelResult;
 export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
     event: string,
-    callbackOnMessage: AblyMessageCallback
+    callbackOnMessage?: AblyMessageCallback
 ): ChannelResult;
 
 export function useChannel(
     channelNameOrNameAndOptions: ChannelParameters,
-    eventOrCallback: string | AblyMessageCallback,
+    eventOrCallback?: string | AblyMessageCallback,
     callback?: AblyMessageCallback
 ): ChannelResult {
     const channelHookOptions =
@@ -67,20 +67,28 @@ export function useChannel(
     }, [ablyMessageCallback]);
 
     useEffect(() => {
-        const listener: AblyMessageCallback = (message) => {
-            ablyMessageCallbackRef.current &&
-                ablyMessageCallbackRef.current(message);
-        };
+        const listener: AblyMessageCallback | null =
+            ablyMessageCallbackRef.current
+                ? (message) => {
+                      ablyMessageCallbackRef.current &&
+                          ablyMessageCallbackRef.current(message);
+                  }
+                : null;
 
-        const subscribeArgs: SubscribeArgs =
-            channelEvent === null ? [listener] : [channelEvent, listener];
+        const subscribeArgs: SubscribeArgs | null = listener
+            ? channelEvent === null
+                ? [listener]
+                : [channelEvent, listener]
+            : null;
 
-        if (!skip) {
+        if (!skip && subscribeArgs) {
             handleChannelMount(channel, ...subscribeArgs);
         }
 
         return () => {
-            !skip && handleChannelUnmount(channel, ...subscribeArgs);
+            !skip &&
+                subscribeArgs &&
+                handleChannelUnmount(channel, ...subscribeArgs);
         };
     }, [channelEvent, channel, skip]);
 
