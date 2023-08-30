@@ -80,11 +80,10 @@ export const AblyProvider = ({
 
     React.useEffect(() => {
         if (!hasSentAgent) {
-            realtime
-                .request('GET', '/time', { agent: 'react-hooks-time-ping' })
-                .then(() => {
-                    hasSentAgent = true;
-                });
+            hasSentAgent = true;
+            realtime.request('GET', '/time', {
+                agent: 'react-hooks-time-ping',
+            });
         }
     });
 
