@@ -82,7 +82,7 @@ export const AblyProvider = ({
         if (!hasSentAgent) {
             hasSentAgent = true;
             realtime.request('GET', '/time', {
-                agent: 'react-hooks-time-ping',
+                agent: `react-hooks-time-ping/${version}`,
             });
         }
     });
