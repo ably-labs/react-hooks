@@ -16,6 +16,10 @@ export class FakeAblySdk {
         this.channels = new ClientChannelsCollection(this, channels);
         return this;
     }
+
+    async request() {
+        return;
+    }
 }
 
 type EventListener = (...args: any[]) => unknown;
