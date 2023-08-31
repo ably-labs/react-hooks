@@ -31,8 +31,10 @@ The hooks provide a simplified syntax for interacting with Ably, and manage the 
 
 The hooks ship as an ES6 module, so you can use the `import` syntax in your react code.
 
+In order to install the latest 3.0 release candidate, 
+
 ```bash
-npm install --save @ably-labs/react-hooks
+npm install --save @ably-labs/react-hooks@rc ably
 ```
 
 This works out of the box using `create-react-app` - and you can use the package immediately.
