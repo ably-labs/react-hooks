@@ -44,3 +44,8 @@ useChannel({channelName: 'my_channel', id: 'foo'}, (msg) => {
   console.log(msg);
 });
 ```
+
+### ably is now a peer dependency
+
+Previously, ably was listed as an explicit dependency of the react-hooks packages, but we've now changed it to a peerDependency to better reflect the relationship between the two packages.
+In most cases you won't need to do anything, but if you are using an older version of NPM (below version 7) you may need to `npm install ably` in order to ensure that it is still installed in your project.
