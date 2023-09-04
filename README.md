@@ -1,5 +1,8 @@
 # @ably-labs/react-hooks
 
+> [!IMPORTANT]  
+> The release candidate of our 3.0 react hooks library is currently available as a module of ably-js, which includes major improvements such as using a context provider and providing APIs to react to connection errors and channel errors. Please see the [new react hooks README](https://github.com/ably/ably-js/blob/main/docs/react.md#L1) for installation instructions and usage examples.
+
 Use Ably in your React application using idiomatic, easy to use, React Hooks!
 
 Using this package you can:
