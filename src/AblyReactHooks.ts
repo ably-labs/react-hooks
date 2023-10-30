@@ -4,7 +4,7 @@ import { Types } from "ably";
 export type ChannelNameAndOptions = { channelName: string; options?: Types.ChannelOptions; realtime?: Types.RealtimePromise, subscribeOnly?: boolean }
 export type ChannelParameters =  string | ChannelNameAndOptions;
 
-const version = "2.1.1"
+const version = "2.1.2"
 
 let sdkInstance: Realtime | null = null;
 
