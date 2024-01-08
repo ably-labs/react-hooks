@@ -41,6 +41,9 @@ export function useChannel(channelNameOrNameAndOptions: ChannelParameters, ...ch
     }
 
     const useEffectHook = () => {
+        if(!channel) {
+            return
+        }
         onMount();
         return () => { onUnmount(); };
     };
